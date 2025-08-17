@@ -10,4 +10,5 @@ export default {
   MONGO_URI: process.env.MONGO_URI || "mongodb://localhost:27017/mydatabase",
   JWT_SECRET: process.env.JWT_SECRET || "defaultsecret",
   JWT_EXPIRATION: process.env.JWT_EXPIRATION || "1h",
+  SALT_ROUNDS: parseInt(process.env.SALT_ROUNDS || "10", 10),
 };

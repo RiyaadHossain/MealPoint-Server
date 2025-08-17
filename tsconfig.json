@@ -8,7 +8,7 @@
        "@/*": ["*"],   
       "@app/*": ["app/*"],
       "@config/*": ["config/*"],
-      "@middlewares/*": ["src/middlewares/*"],
+      "@middlewares/*": ["middlewares/*"],
       "@controllers/*": ["controllers/*"],
       "@utils/*": ["utils/*"]
     },

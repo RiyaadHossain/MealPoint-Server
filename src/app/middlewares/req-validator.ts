@@ -1,6 +1,7 @@
 
 import type { NextFunction, Request, Response } from "express";
-import type { AnyZodObject, ZodEffects } from "zod/v3";
+// @ts-ignore
+import type { AnyZodObject, ZodEffects } from "zod";
 
 
 // use the latest version of zod

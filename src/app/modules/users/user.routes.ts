@@ -6,4 +6,4 @@ router.get('/', (_req, res) => {
   res.send('User route is working!');
 });
 
-export default router;
+export const userRoutes = router;

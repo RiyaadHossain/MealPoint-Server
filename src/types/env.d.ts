@@ -8,6 +8,7 @@ declare namespace NodeJS {
     MONGO_URI?: string;
     JWT_SECRET?: string;
     JWT_EXPIRATION?: string;
+    SALT_ROUNDS?: string;
     // add other env variables you expect here
   }
 }

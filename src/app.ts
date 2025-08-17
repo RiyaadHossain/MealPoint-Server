@@ -21,7 +21,7 @@ app.get("/health", (_req, res) => res.send("OK"));
 //handle not found
 app.use(notFoundHandler);
 
-// Error Handling middleware (must be last)
+// Global Error Handling middleware (must be last)
 app.use(errorHandler);
 
 export default app;
