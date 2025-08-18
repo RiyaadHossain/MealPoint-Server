@@ -5,11 +5,11 @@ import type { Request, Response } from "express";
 import { MenuService } from "./menu.services.js";
 import pick from "@/shared/pick.js";
 import { paginationFields } from "@/constants/pagination.js";
-import { filterableFields } from "./menu.constants.js";
+import { menuFilterableFields } from "./menu.constants.js";
 
 const getMenus = catchAsync(async (req: Request, res: Response) => {
   const paginationOptions = pick(req.query, paginationFields);
-  const filterOptions = pick(req.query, filterableFields);
+  const filterOptions = pick(req.query, menuFilterableFields);
 
   const response = await MenuService.getMenus(paginationOptions, filterOptions);
 

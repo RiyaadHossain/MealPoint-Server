@@ -3,6 +3,7 @@ import { userRoutes } from "../modules/users/user.routes.js";
 import { authRoutes } from "../modules/auth/auth.routes.js";
 import { menuRoutes } from "../modules/menus/menu.routes.js";
 import { categoryRoutes } from "../modules/categories/category.routes.js";
+import { comboRoutes } from "../modules/combos/combo.routes.js";
 
 const router = express.Router();
 
@@ -19,6 +20,10 @@ const moduleRoutes = [
   {
     path: "/categories",
     routes: categoryRoutes
+  },
+  {
+    path: "/combos",
+    routes: comboRoutes
   }
 ];
 

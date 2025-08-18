@@ -1,0 +1,18 @@
+import { Types } from "mongoose";
+
+export interface IComboItem {
+  item: Types.ObjectId; // Reference to menu item
+  quantity: number;
+  price: number;
+}
+
+export interface ICombo {
+  id: string;
+  name: string;
+  description: string;
+  totalPrice: number;
+  image: string;
+  items: IComboItem[];
+  isAvailable: boolean;
+  estimatedTime: string;
+}

@@ -4,11 +4,11 @@ import { generateMenuId } from "@/utils/menu-id.js";
 import type { IPaginationType } from "@/interfaces/paginaiton.js";
 import { paginationHelpers } from "@/helper/paginationHelper.js";
 import type { SortOrder } from "mongoose";
-import { searchableFields } from "./menu.constants.js";
 import { rangeEnd, rangeStart } from "@/constants/range.query.js";
 import { actualFilterField } from "@/utils/format-text.js";
 import { isMongoObjectId } from "@/utils/mongodb.js";
 import mongoose from "mongoose";
+import { menuSearchableFields } from "./menu.constants.js";
 
 const getMenus = async (
   paginationOptions: IPaginationType,
@@ -28,7 +28,7 @@ const getMenus = async (
   const andCondition = [];
   if (searchTerm) {
     andCondition.push({
-      $or: searchableFields.map((field) => ({
+      $or: menuSearchableFields.map((field) => ({
         [field]: { $regex: searchTerm, $options: "i" },
       })),
     });
@@ -39,7 +39,7 @@ const getMenus = async (
       $and: Object.entries(filtersData).map(([field, value]) => {
         // Handle range queries
         if (field.startsWith(rangeStart))
-          return { [actualFilterField(field, rangeStart)]: { $lte: value } };
+          return { [actualFilterField(field, rangeStart)]: { $gte: value } };
 
         if (field.startsWith(rangeEnd))
           return { [actualFilterField(field, rangeEnd)]: { $lte: value } };
