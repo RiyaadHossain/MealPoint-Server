@@ -1,8 +1,11 @@
 import { User } from "@/app/modules/users/user.model.js";
+import { UserRole } from "@/enums/user.enum.js";
 
-export const generateUserId = async (): Promise<string> => {
+export const generateUserId = async (
+  role: UserRole = UserRole.CUSTOMER
+): Promise<string> => {
   // Find the latest user by id in descending order
-  const latestUser = await User.findOne({ id: /^C-\d{5}$/ })
+  const latestUser = await User.findOne({ id: /^C-\d{5}$/, role })
     .sort({ id: -1 })
     .select("id")
     .lean();
@@ -15,6 +18,8 @@ export const generateUserId = async (): Promise<string> => {
     }
   }
 
-  const nextId = `C-${nextNumber.toString().padStart(5, "0")}`;
+  const nextId = `${role === UserRole.CUSTOMER ? "C" : "A"}-${nextNumber
+    .toString()
+    .padStart(5, "0")}`;
   return nextId;
 };

@@ -7,7 +7,7 @@ import { jwtHelpers } from "@/helper/jwtHelper.js";
 import { generateUserId } from "@/utils/user-id.js";
 
 const register = async (userData: IUser) => {
-  const { email } = userData;
+  const { email, role } = userData;
 
   const existingUser = await User.findOne({ email });
   if (existingUser) {
@@ -15,7 +15,7 @@ const register = async (userData: IUser) => {
   }
 
   // Generate a unique user ID
-  userData.id = await generateUserId();
+  userData.id = await generateUserId(role);
 
   const user = await User.create(userData);
 
@@ -29,12 +29,10 @@ const login = async (credential: ILoginCridential) => {
   }
 
   // Compare the provided password with the stored hashed password
-  console.log(credential.password, user.password);
   const isMatch = await bcrypt.compare(credential.password, user.password);
   if (!isMatch) {
     throw new Error("Invalid email or password");
   }
-
 
   const { id, role } = user;
   const token = jwtHelpers.createToken(
@@ -46,7 +44,42 @@ const login = async (credential: ILoginCridential) => {
   return { user, token };
 };
 
+const getProfile = async (userId: string) => {
+  const user = await User.findOne({ id: userId });
+  if (!user) {
+    throw new Error("User not found");
+  }
+  // Exclude password from returned profile
+  const { password, ...profile } = user.toObject();
+  return profile;
+};
+
+const updateProfile = async (userId: string, updateData: Partial<IUser>) => {
+  // Prevent password update through this function
+  if (updateData.password) {
+    delete updateData.password;
+  }
+
+  // check if the user exists
+  const existingUser = await User.findOne({ id: userId });
+  if (!existingUser) {
+    throw new Error("User not found");
+  }
+
+  // Update user profile
+  const user = await User.findOneAndUpdate({ id: userId }, updateData, {
+    new: true,
+  });
+  if (!user) {
+    throw new Error("User not found");
+  }
+  const { password, ...profile } = user.toObject();
+  return profile;
+};
+
 export const AuthService = {
   register,
   login,
+  getProfile,
+  updateProfile,
 };

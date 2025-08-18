@@ -1,4 +1,4 @@
-import type { NextFunction, Request } from "express";
+import type { NextFunction, Request, Response } from "express";
 import httpStatus from "http-status";
 import type { Secret } from "jsonwebtoken";
 import config from "@/config/index.js";

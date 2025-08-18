@@ -31,7 +31,38 @@ const login = catchAsync(async (req, res) => {
   sendResponse(res, responseData);
 });
 
+const getProfile = catchAsync(async (req, res) => {
+  const userId = req?.user?.["id"];
+  const user = await AuthService.getProfile(userId);
+
+  const responseData = {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "User profile retrieved successfully",
+    data: user,
+  };
+
+  sendResponse(res, responseData);
+});
+
+const updateProfile = catchAsync(async (req, res) => {
+  const userData = req.body;
+  const userId = req?.user?.["id"];
+  const user = await AuthService.updateProfile(userId, userData);
+
+  const responseData = {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "User profile updated successfully",
+    data: user,
+  };
+
+  sendResponse(res, responseData);
+});
+
 export const AuthController = {
   register,
   login,
+  getProfile,
+  updateProfile,
 };

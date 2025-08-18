@@ -17,3 +17,13 @@ export const loginSchema = z.object({
     password: z.string().min(6),
   }),
 });
+
+
+export const updateSchema = z.object({
+  body: z.object({
+    name: z.string().min(1).max(100).optional(),
+    phone: z.string().optional(),
+    address: z.string().optional(),
+    profileImage: z.url().optional(),
+  }),
+});
