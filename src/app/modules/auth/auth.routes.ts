@@ -25,6 +25,7 @@ router.get(
   auth(UserRole.CUSTOMER, UserRole.ADMIN),
   AuthController.getProfile
 );
+
 router.patch(
   "/profile",
   validateRequest(updateSchema),

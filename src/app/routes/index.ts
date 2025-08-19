@@ -5,6 +5,7 @@ import { menuRoutes } from "../modules/menus/menu.routes.js";
 import { categoryRoutes } from "../modules/categories/category.routes.js";
 import { comboRoutes } from "../modules/combos/combo.routes.js";
 import { orderRoutes } from "../modules/orders/order.routes.js";
+import { ReviewRoutes } from "../modules/reviews/review.routes.js";
 
 const router = express.Router();
 
@@ -30,6 +31,10 @@ const moduleRoutes = [
     path: "/orders",
     routes: orderRoutes,
   },
+  {
+    path: "/reviews",
+    routes: ReviewRoutes
+  }
 ];
 
 moduleRoutes.forEach((route) => router.use(route.path, route.routes));

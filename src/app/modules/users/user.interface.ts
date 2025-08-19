@@ -25,3 +25,9 @@ export interface IUserModel extends Model<IUser> {
 export interface IUserMethods {
   comparePassword(candidatePassword: string): Promise<boolean>;
 }
+
+export interface IUserFilterOptions {
+  searchTerm?: string;
+  role?: UserRole;
+  email?: string;
+}
