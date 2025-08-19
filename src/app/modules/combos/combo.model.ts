@@ -14,6 +14,7 @@ const ComboSchema = new Schema<ICombo>(
     description: { type: String },
     totalPrice: { type: Number, required: true, min: 0 },
     image: { type: String },
+    totalSold: { type: Number, default: 0 },
     items: { type: [ComboItemSchema], required: true },
     isAvailable: { type: Boolean, default: true },
     estimatedTime: { type: String },

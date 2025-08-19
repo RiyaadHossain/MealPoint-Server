@@ -11,6 +11,7 @@ export interface ICombo {
   name: string;
   description: string;
   totalPrice: number;
+  totalSold: number;
   image: string;
   items: IComboItem[];
   isAvailable: boolean;
