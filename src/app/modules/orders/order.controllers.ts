@@ -7,6 +7,7 @@ import { OrderService } from "./order.services.js";
 import pick from "@/shared/pick.js";
 import { paginationFields } from "@/constants/pagination.js";
 import { orderFilterableFields } from "./order.constants.js";
+import { OrderStatus } from "@/enums/order.enum.js";
 
 const getOrders = catchAsync(async (req: Request, res: Response) => {
   const paginationOptions = pick(req.query, paginationFields);
@@ -81,10 +82,36 @@ const updateOrder = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+/**
+ * Approve or reject an order (admin only)
+ */
+const approveOrder = catchAsync(async (req: Request, res: Response) => {
+  const orderId = req.params["id"] as string;
+  const status = req.body?.status as OrderStatus;
+
+  if (!status || !Object.keys(OrderStatus).includes(status)) {
+    return sendResponse(res, {
+      success: false,
+      statusCode: httpStatus.BAD_REQUEST,
+      message: "Invalid status. Must be APPROVED or REJECTED.",
+      data: null,
+    });
+  }
+
+  const order = await OrderService.approveOrder(orderId, status);
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: `Order ${status.toLowerCase()} successfully`,
+    data: order,
+  });
+});
+
 export const OrderController = {
   getOrders,
   getOrderById,
   getOrdersByCustomerId,
   createOrder,
   updateOrder,
+  approveOrder,
 };

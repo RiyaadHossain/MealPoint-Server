@@ -40,4 +40,7 @@ router.patch(
   OrderController.updateOrder
 );
 
+// Approve or reject order (admin only)
+router.patch("/:id/approve", auth(UserRole.ADMIN), OrderController.approveOrder);
+
 export const orderRoutes = router;

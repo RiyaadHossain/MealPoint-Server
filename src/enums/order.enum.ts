@@ -1,7 +1,9 @@
 // Order status and type enums
 export enum OrderStatus {
   PENDING = "pending",
-  CONFIRMED = "confirmed",
+  APPROVED = "approved",
+  REJECTED = "rejected",
+  PAID = "paid",
   DELIVERED = "delivered",
   CANCELLED = "cancelled",
 }

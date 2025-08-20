@@ -11,8 +11,12 @@ import { isMongoObjectId } from "@/utils/mongodb.js";
 import mongoose from "mongoose";
 import { User } from "../users/user.model.js";
 import { Menu } from "../menus/menu.model.js";
-import { OrderItemType } from "@/enums/order.enum.js";
+import { OrderItemType, OrderStatus } from "@/enums/order.enum.js";
 import { Combo } from "../combos/combo.model.js";
+import { NotificationService } from "../notifications/notification.services.js";
+import { getAdminsId } from "../auth/auth.utils.js";
+import { NotificationType } from "@/enums/notification-type.enum.js";
+import { NotificationEvents } from "../notifications/notification.constants.js";
 
 /**
  * Get paginated and filtered orders
@@ -72,10 +76,12 @@ const getOrders = async (
  */
 const getOrderById = async (orderId: string) => {
   // check if order exists
-  let order = await Order.findOne({ id: orderId }).populate({
-    path: "user",
-    select: commonUserFields,
-  }).lean();
+  let order = await Order.findOne({ id: orderId })
+    .populate({
+      path: "user",
+      select: commonUserFields,
+    })
+    .lean();
   if (!order) throw new Error("Order not found");
 
   const orderItems = await OrderItem.find({ orderId: order._id }).populate({
@@ -84,7 +90,7 @@ const getOrderById = async (orderId: string) => {
 
   // order = order.toObject(); // convert to plain object to add items
   order.items = orderItems;
-  console.log(order)
+  console.log(order);
 
   return order;
 };
@@ -102,9 +108,9 @@ const getOrdersByCustomerId = async (customerId: string) => {
   // populate order items and other related data
   await Promise.all(
     orders.map(async (order) => {
-      const orderItems = await OrderItem.find({ orderId: order._id }).populate(
-        "menuItemId"
-      ).lean();
+      const orderItems = await OrderItem.find({ orderId: order._id })
+        .populate("menuItemId")
+        .lean();
       order.items = orderItems;
     })
   );
@@ -142,7 +148,6 @@ const createOrder = async (userId: string, orderData: IOrder) => {
     })
   );
 
-
   /*
    * check discount and apply if any
    * calculate net price etc.
@@ -154,13 +159,25 @@ const createOrder = async (userId: string, orderData: IOrder) => {
   orderData.user = userExists._id;
 
   const order = await Order.create(orderData);
-  console.log(order);
 
   // create order items
   await Promise.all(
     orderData.items.map(async (item) => {
       item.orderId = order._id;
       await OrderItem.create(item);
+    })
+  );
+
+  const adminsId = await getAdminsId();
+
+  await Promise.all(
+    adminsId.map(async (adminId) => {
+      // create notification for admin
+      await NotificationService.createNotificationForEvent(
+        adminId,
+        NotificationType.ADMIN_EVENT,
+        NotificationEvents.ORDER_CREATED_ADMIN
+      );
     })
   );
 
@@ -179,10 +196,39 @@ const updateOrder = async (orderId: string, updateData: Partial<IOrder>) => {
   return order;
 };
 
+/**
+ * Approve or reject an order (admin only)
+ */
+const approveOrder = async (orderId: string, status: OrderStatus) => {
+  const order = await Order.findById(orderId);
+  if (!order) throw new Error("Order not found");
+  order.status = status;
+  await order.save();
+
+  // Send notification to customer
+  const user = await User.findById(order.user);
+  if (!user) throw new Error("User not found");
+
+  const notificationEvent =
+    status === OrderStatus.APPROVED
+      ? NotificationEvents.ORDER_PROCEEDED
+      : NotificationEvents.ORDER_REJECTED;
+
+  await NotificationService.createNotificationForEvent(
+    // @ts-ignore
+    user._id,
+    NotificationType.USER_EVENT,
+    notificationEvent
+  );
+
+  return order;
+};
+
 export const OrderService = {
   getOrders,
   getOrderById,
   getOrdersByCustomerId,
   createOrder,
   updateOrder,
+  approveOrder,
 };

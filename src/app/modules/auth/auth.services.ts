@@ -5,6 +5,10 @@ import type { ILoginCridential } from "./auth.interface.js";
 import config from "@/config/index.js";
 import { jwtHelpers } from "@/helper/jwtHelper.js";
 import { generateUserId } from "@/utils/user-id.js";
+import { NotificationService } from "../notifications/notification.services.js";
+import { NotificationType } from "@/enums/notification-type.enum.js";
+import { NotificationEvents } from "../notifications/notification.constants.js";
+import { getAdminsId } from "./auth.utils.js";
 
 const register = async (userData: IUser) => {
   const { email, role } = userData;
@@ -17,7 +21,29 @@ const register = async (userData: IUser) => {
   // Generate a unique user ID
   userData.id = await generateUserId(role);
 
-  const user = await User.create(userData);
+  const user: IUser = await User.create(userData);
+
+  const userId = user._id.toString();
+
+  // Send Notifications
+  await NotificationService.createNotificationForEvent(
+    userId,
+    NotificationType.USER_EVENT,
+    NotificationEvents.USER_FIRST_LOGIN
+  );
+
+  const adminsId = await getAdminsId();
+
+  await Promise.all(
+    adminsId.map(
+      async (adminId) =>
+        await NotificationService.createNotificationForEvent(
+          adminId,
+          NotificationType.ADMIN_EVENT,
+          NotificationEvents.USER_NEW_LOGIN
+        )
+    )
+  );
 
   return user;
 };
