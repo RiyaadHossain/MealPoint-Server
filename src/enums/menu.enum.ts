@@ -1,5 +1,5 @@
 export enum MenuLabel {
-  NONE = "",
+  REGULAR = "regular",
   MOST_POPULAR = "most-popular",
   NEW = "new",
   CHEF_SPECIAL = "chef-special",
