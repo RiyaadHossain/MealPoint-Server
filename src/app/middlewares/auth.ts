@@ -19,7 +19,7 @@ const auth =
 
       verifiedUser = jwtHelpers.verifyToken(token, config.JWT_SECRET as Secret);
 
-      req.user = verifiedUser; // role  , userid
+      req.user = verifiedUser; 
 
       // check user role
       if (
