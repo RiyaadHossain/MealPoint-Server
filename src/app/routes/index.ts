@@ -7,6 +7,8 @@ import { comboRoutes } from "../modules/combos/combo.routes.js";
 import { orderRoutes } from "../modules/orders/order.routes.js";
 import { ReviewRoutes } from "../modules/reviews/review.routes.js";
 import { NotificationRoutes } from "../modules/notifications/notification.route.js";
+import { PaymentRoutes } from "../modules/payments/payment.routes.js";
+import { AdminSettingsRoutes } from "../modules/settings/setting.routes.js";
 
 const router = express.Router();
 
@@ -39,6 +41,14 @@ const moduleRoutes = [
   {
     path: "/notifications",
     routes: NotificationRoutes
+  }, 
+  {
+    path: "/payments",
+    routes: PaymentRoutes
+  }, 
+  {
+    path: "/settings",
+    routes: AdminSettingsRoutes
   }, 
 ];
 

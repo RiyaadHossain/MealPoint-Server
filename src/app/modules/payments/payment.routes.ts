@@ -33,4 +33,4 @@ router.patch(
 router.get("/", PaymentController.getAllPayments); // Admin - Get all payments
 router.get("/user/:userId", PaymentController.getUserPaymentHistory); // Customer - Get payment history
 
-export default router;
+export const PaymentRoutes = router;
