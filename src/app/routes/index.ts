@@ -9,6 +9,7 @@ import { ReviewRoutes } from "../modules/reviews/review.routes.js";
 import { NotificationRoutes } from "../modules/notifications/notification.route.js";
 import { PaymentRoutes } from "../modules/payments/payment.routes.js";
 import { AdminSettingsRoutes } from "../modules/settings/setting.routes.js";
+import { AdminRoutes } from "../modules/admins/admin.routes.js";
 
 const router = express.Router();
 
@@ -49,6 +50,10 @@ const moduleRoutes = [
   {
     path: "/settings",
     routes: AdminSettingsRoutes
+  }, 
+  {
+    path: "/admins",
+    routes: AdminRoutes
   }, 
 ];
 

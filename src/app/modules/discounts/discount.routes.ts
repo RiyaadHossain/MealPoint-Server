@@ -22,7 +22,7 @@ router.post(
 // List all discounts
 router.get(
   "/",
-  auth(UserRole.ADMIN, UserRole.CUSTOMER),
+  auth(UserRole.ADMIN),
   DiscountController.getDiscounts
 );
 

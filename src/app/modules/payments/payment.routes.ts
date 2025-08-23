@@ -17,6 +17,9 @@ router.post(
   PaymentController.createPayment
 );
 
+router.get("/", PaymentController.getAllPayments); // Admin - Get all payments
+router.get("/user/:userId", PaymentController.getUserPaymentHistory); // Customer - Get payment history
+
 router.get(
   "/:id",
   auth(UserRole.ADMIN, UserRole.CUSTOMER),
@@ -29,8 +32,5 @@ router.patch(
   validateRequest(updatePaymentStatusSchema),
   PaymentController.updatePaymentStatus
 );
-
-router.get("/", PaymentController.getAllPayments); // Admin - Get all payments
-router.get("/user/:userId", PaymentController.getUserPaymentHistory); // Customer - Get payment history
 
 export const PaymentRoutes = router;

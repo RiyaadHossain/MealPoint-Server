@@ -15,7 +15,7 @@ const MenuSchema = new Schema<IMenu>(
     label: {
       type: String,
       enum: Object.values(MenuLabel),
-      default: MenuLabel.NONE,
+      default: MenuLabel.REGULAR,
     },
     estimatedTime: { type: Number, required: true },
   },

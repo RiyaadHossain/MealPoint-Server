@@ -151,6 +151,7 @@ const createOrder = async (userId: string, orderData: IOrder) => {
   /*
    * check discount and apply if any
    * calculate net price etc.
+   * calc tax
   */
 
   orderData.id = await generateOrderId();
