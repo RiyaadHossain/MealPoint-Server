@@ -9,6 +9,7 @@ declare namespace NodeJS {
     JWT_SECRET?: string;
     JWT_EXPIRATION?: string;
     SALT_ROUNDS?: string;
-    // add other env variables you expect here
+    STRIPE_API_KEY?: string;
+    CLIENT_URL: string
   }
 }

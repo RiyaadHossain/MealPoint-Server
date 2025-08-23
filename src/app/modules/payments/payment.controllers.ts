@@ -33,7 +33,7 @@ const getPaymentById = catchAsync(async (req: Request, res: Response) => {
 
 const updatePaymentStatus = catchAsync(async (req: Request, res: Response) => {
   const id = req.params?.["id"] as string;
-  const result = await PaymentService.updatePaymentStatus(id, req.body.status);
+  const result = await PaymentService.updatePaymentStatus(id, req.body);
 
   sendResponse(res, {
     success: true,

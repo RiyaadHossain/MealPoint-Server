@@ -10,6 +10,7 @@ export interface IPayment extends Document {
   transactionId?: string; // Gateway transaction reference
   createdAt: Date;
   updatedAt: Date;
+  stripeSessionId?: string;
 }
 
 export interface IPaymentFilterOptions {
@@ -18,4 +19,9 @@ export interface IPaymentFilterOptions {
   userId?: Types.ObjectId;
   startAmount?: string;
   endAmount?: string;
+}
+
+export interface IUpdatePaymentPayload {
+  status: PaymentStatus
+  session_id: string 
 }

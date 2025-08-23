@@ -2,7 +2,10 @@ import { paginationHelpers } from "@/helper/paginationHelper.js";
 import type { SortOrder } from "mongoose";
 import { Payment } from "./payment.model.js";
 import type { IPaginationType } from "@/interfaces/paginaiton.js";
-import type { IPaymentFilterOptions } from "./payment.interface.js";
+import type {
+  IPaymentFilterOptions,
+  IUpdatePaymentPayload,
+} from "./payment.interface.js";
 import { actualFilterField } from "@/utils/format-text.js";
 import { rangeEnd, rangeStart } from "@/constants/range.query.js";
 import { isMongoObjectId } from "@/utils/mongodb.js";
@@ -13,44 +16,83 @@ import httpStatus from "http-status";
 import { User } from "../users/user.model.js";
 import { PaymentStatus } from "@/enums/payment.enum.js";
 import { OrderStatus } from "@/enums/order.enum.js";
+import config from "@/config/index.js";
+import { stripe } from "@/config/payment.js";
 
 const createPayment = async (userId: string, payload: any) => {
-  // 1. Validate order
+  // 1️⃣ Validate order
   const order = await Order.findById(payload.orderId);
   if (!order) throw new ApiError(httpStatus.NOT_FOUND, "Order not found");
 
-  //   if (order.totalPrice !== payload.amount) {
-  //     throw new ApiError(httpStatus.BAD_REQUEST, "Amount mismatch");
-  //   }
+  // Optional: validate amount
+  if (order.totalPrice !== payload.amount) {
+    throw new ApiError(httpStatus.BAD_REQUEST, "Amount mismatch");
+  }
 
-  // 2. Validate order
+  // 2️⃣ Validate user
   const user = await User.findOne({ id: userId });
   if (!user) throw new ApiError(httpStatus.NOT_FOUND, "User account not found");
 
-  // 3. Generate transaction reference
+  // 3️⃣ Generate transaction reference
   const transactionId = `txn_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
 
-  // ToDo: initiate third-party transaction
+  //  Initialize Stripe
 
-  // 4. Create payment record
-  const payment = await Payment.create({
-    userId: user._id,
-    orderId: payload.orderId,
-    amount: payload.amount,
-    method: payload.method,
-    status: "PENDING", // or COMPLETED for COD
-    transactionId,
+  const line_items = order.items.map((item: any) => ({
+    price_data: {
+      currency: "usd", // optionally make dynamic per restaurant
+      product_data: {
+        name: item.name,
+        images: [item.image || ""],
+        description: item.description || "",
+      },
+      unit_amount: Math.round(item.price * 100), // amount in cents
+    },
+    quantity: item.quantity,
+  }));
+
+  // 4️⃣ Create Checkout Session
+  const session = await stripe.checkout.sessions.create({
+    ui_mode: "embedded", // Embedded checkout
+    line_items,
+    mode: "payment",
+    success_url: `${config.CLIENT_URL}/payment-success?session_id={CHECKOUT_SESSION_ID}`,
+    cancel_url: `${config.CLIENT_URL}/payment-cancel`,
   });
 
-  return payment;
+  // 5️⃣ Save payment record in your DB
+  const payment = await Payment.create({
+    userId: user._id,
+    orderId: order._id,
+    amount: payload.amount,
+    method: payload.method || "stripe",
+    status: PaymentStatus.PENDING,
+    transactionId,
+    stripeSessionId: session.id, // save for later verification
+  });
+
+  // 6️⃣ Return session info to frontend
+  return {
+    payment,
+    checkoutSession: {
+      id: session.id,
+      clientSecret: session.client_secret, // frontend can use this to open embedded checkout
+      url: session.url, // optional, for redirect fallback
+    },
+  };
 };
+
+export default createPayment;
 
 const getPaymentById = async (id: string) => {
   const payment = await Payment.findById(id).populate("userId orderId");
   return payment;
 };
 
-const updatePaymentStatus = async (id: string, status: PaymentStatus) => {
+const updatePaymentStatus = async (
+  id: string,
+  payload: IUpdatePaymentPayload
+) => {
   // 1. Find payment
   const payment = await Payment.findById(id);
   if (!payment) {
@@ -71,17 +113,26 @@ const updatePaymentStatus = async (id: string, status: PaymentStatus) => {
   }
 
   // 3. Update payment status
-  payment.status = status;
+  payment.status = payload.status;
   await payment.save();
 
   // 4. Update order if payment is completed
-  if (status === PaymentStatus.SUCCESS) {
+  if (payload.status === PaymentStatus.SUCCESS) {
     await Order.findByIdAndUpdate(payment.orderId, {
       status: OrderStatus.PAID,
     });
   }
 
-  return payment;
+  const session = await stripe.checkout.sessions.retrieve(payload.session_id);
+
+  return {
+    payment,
+    checkoutSession: {
+      id: session.id,
+      clientSecret: session.client_secret,
+      url: session.url,
+    },
+  };
 };
 
 const getAllPayments = async (

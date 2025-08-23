@@ -11,6 +11,7 @@ export const createPaymentSchema = z.object({
 export const updatePaymentStatusSchema = z.object({
   body: z.object({
     status: z.enum(["pending", "success", "failed", "cancelled"]),
+    session_id: z.string()
   }),
 });
 

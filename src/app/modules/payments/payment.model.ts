@@ -5,6 +5,7 @@ import { PaymentStatus } from "@/enums/payment.enum.js";
 const PaymentSchema: Schema = new Schema<IPayment>(
   {
     transactionId: { type: String, unique: true, required: true },
+    stripeSessionId: { type: String, unique: true },
     userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
     orderId: { type: Schema.Types.ObjectId, ref: "Order", required: true },
     amount: { type: Number, required: true },
@@ -14,6 +15,7 @@ const PaymentSchema: Schema = new Schema<IPayment>(
       enum: Object.values(PaymentStatus),
       default: PaymentStatus.PENDING,
     },
+    
   },
   { timestamps: true }
 );
