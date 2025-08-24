@@ -9,6 +9,8 @@ import { NotificationService } from "../notifications/notification.services.js";
 import { NotificationType } from "@/enums/notification-type.enum.js";
 import { NotificationEvents } from "../notifications/notification.constants.js";
 import { getAdminsId } from "./auth.utils.js";
+import ApiError from "@/errors/ApiError.js";
+import httpStatus from "http-status"
 
 const register = async (userData: IUser) => {
   const { email, role } = userData;
@@ -21,8 +23,10 @@ const register = async (userData: IUser) => {
   // Generate a unique user ID
   userData.id = await generateUserId(role);
 
-  const user: IUser = await User.create(userData);
+  const user = await User.create(userData);
+  if(!user) throw new ApiError(httpStatus.BAD_REQUEST, "User not found")
 
+  // @ts-ignore
   const userId = user._id.toString();
 
   // Send Notifications

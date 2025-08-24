@@ -7,4 +7,5 @@ export enum UserLevel {
   BRONZE = "bronze",
   SILVER = "silver",
   GOLD = "gold",
+  PLATINUM = "platinum",
 }

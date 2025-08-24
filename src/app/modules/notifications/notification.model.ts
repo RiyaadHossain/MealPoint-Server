@@ -5,7 +5,7 @@ import { NotificationType } from "@/enums/notification-type.enum.js";
 
 const notificationSchema = new Schema<INotification>(
   {
-    userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
+    userId: { type: Schema.Types.ObjectId, ref: "User" },
     type: { type: String, enum: Object.values(NotificationType), required: true },
     title: { type: String, required: true },
     message: { type: String, required: true },

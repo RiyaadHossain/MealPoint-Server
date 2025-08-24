@@ -11,11 +11,10 @@ const orderItemSchema = z.object({
 
 export const createOrderSchema = z.object({
   body: z.object({
-    status: z.enum(Object.values(OrderStatus)).optional(),
     discount: z.string().optional(),
     type: z.enum(Object.values(OrderType)),
     deliveryAddress: z.string().optional(),
-    discountIds: z.array(z.string()),
+    discountId: z.string().optional(),
     notes: z.string().optional(),
     items: z
       .array(orderItemSchema)

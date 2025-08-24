@@ -12,7 +12,7 @@ const ComboSchema = new Schema<ICombo>(
     id: { type: String, required: true, unique: true },
     name: { type: String, required: true },
     description: { type: String },
-    totalPrice: { type: Number, required: true, min: 0 },
+    price: { type: Number, required: true, min: 0 },
     image: { type: String },
     totalSold: { type: Number, default: 0 },
     items: { type: [ComboItemSchema], required: true },

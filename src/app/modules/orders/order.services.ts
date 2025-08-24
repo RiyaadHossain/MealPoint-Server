@@ -4,7 +4,7 @@ import type { IOrder, IOrderFilterOptions } from "./order.interface.js";
 import { generateOrderId } from "@/utils/order-id.js";
 import type { IPaginationType } from "@/interfaces/paginaiton.js";
 import { paginationHelpers } from "@/helper/paginationHelper.js";
-import { commonUserFields, orderSearchableFields } from "./order.constants.js";
+import {  orderSearchableFields } from "./order.constants.js";
 import { rangeEnd, rangeStart } from "@/constants/range.query.js";
 import { actualFilterField } from "@/utils/format-text.js";
 import { isMongoObjectId } from "@/utils/mongodb.js";
@@ -19,7 +19,7 @@ import { NotificationType } from "@/enums/notification-type.enum.js";
 import { NotificationEvents } from "../notifications/notification.constants.js";
 import { DiscountService } from "../discounts/discount.services.js";
 import ApiError from "@/errors/ApiError.js";
-import httpStatus from "http-status"
+import httpStatus from "http-status";
 import { getTaxAmount } from "./order.utils.js";
 
 /**
@@ -62,7 +62,11 @@ const getOrders = async (
     ? { $and: andCondition }
     : {};
 
-  const data = await Order.find(whereCondition).skip(skip).limit(limit).lean();
+  const data = await Order.find(whereCondition)
+    .populate("user")
+    .skip(skip)
+    .limit(limit)
+    .lean();
   const total = await Order.countDocuments(whereCondition);
 
   return {
@@ -80,22 +84,16 @@ const getOrders = async (
  */
 const getOrderById = async (orderId: string) => {
   // check if order exists
-  let order = await Order.findOne({ id: orderId })
-    .populate({
-      path: "user",
-      select: commonUserFields,
-    })
-    .lean();
+  let order = await Order.findOne({ id: orderId }).populate("user").lean();
   if (!order) throw new Error("Order not found");
 
-  const orderItems = await OrderItem.find({ orderId: order._id }).populate({
-    path: "menuItemId",
-  });
+  const orderItems = await OrderItem.find({ orderId: order._id }).populate([
+    { path: "menuItemId" },
+    { path: "comboItemId", populate: "items.item" },
+  ]);
 
   // order = order.toObject(); // convert to plain object to add items
   order.items = orderItems;
-  console.log(order);
-
   return order;
 };
 
@@ -113,7 +111,10 @@ const getOrdersByCustomerId = async (customerId: string) => {
   await Promise.all(
     orders.map(async (order) => {
       const orderItems = await OrderItem.find({ orderId: order._id })
-        .populate("menuItemId")
+        .populate([
+          { path: "menuItemId" },
+          { path: "comboItemId", populate: "items.item" },
+        ])
         .lean();
       order.items = orderItems;
     })
@@ -144,7 +145,9 @@ const createOrder = async (
         itemExists = await Combo.findById(item.comboItemId);
 
       if (!itemExists)
-        throw new Error(`Menu item ${item.menuItemId} not found`);
+        throw new Error(
+          `Menu item ${item.menuItemId || item.comboItemId} not found`
+        );
 
       itemExists.totalSold += item.quantity; // increment total sold
       await itemExists.save(); // save updated total sold
@@ -158,18 +161,24 @@ const createOrder = async (
   orderData.id = await generateOrderId();
   orderData.totalPrice = totalPrice;
   orderData.user = userExists._id;
+  console.log({orderData})
 
   const order = await Order.create(orderData);
-  if(!order) throw new ApiError(httpStatus.BAD_REQUEST, "Internal Server Error")
+  if (!order)
+    throw new ApiError(httpStatus.BAD_REQUEST, "Internal Server Error");
 
   let discountAmount = 0;
-  if (orderData.discountId) { 
-    const discount = await DiscountService.applyDiscount(order._id, orderData.discountId, userId)
-    discountAmount = discount.discountAmount
-    order.discount = discount._id
+  if (orderData.discountId) {
+    const discount = await DiscountService.applyDiscount(
+      order._id,
+      orderData.discountId,
+      userId
+    );
+    discountAmount = discount.discountAmount;
+    order.discount = discount._id;
   }
 
-  order.netPrice = totalPrice - discountAmount; 
+  order.netPrice = totalPrice - discountAmount;
   order.netPrice += await getTaxAmount(order.netPrice);
 
   // create order items

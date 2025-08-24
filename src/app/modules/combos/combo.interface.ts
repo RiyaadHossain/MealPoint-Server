@@ -10,7 +10,7 @@ export interface ICombo {
   id: string;
   name: string;
   description: string;
-  totalPrice: number;
+  price: number;
   totalSold: number;
   image: string;
   items: IComboItem[];

@@ -12,6 +12,9 @@ app.use(cors());
 app.use(express.json());
 app.use(helmet()); // Security headers
 
+// scripts
+// updateMenuCategories()
+
 // Routes
 app.use('/api/v1/', router);
 

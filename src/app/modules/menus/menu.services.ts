@@ -9,6 +9,9 @@ import { actualFilterField } from "@/utils/format-text.js";
 import { isMongoObjectId } from "@/utils/mongodb.js";
 import mongoose from "mongoose";
 import { menuSearchableFields } from "./menu.constants.js";
+import { NotificationService } from "../notifications/notification.services.js";
+import { NotificationType } from "@/enums/notification-type.enum.js";
+import { NotificationEvents } from "../notifications/notification.constants.js";
 
 const getMenus = async (
   paginationOptions: IPaginationType,
@@ -57,7 +60,7 @@ const getMenus = async (
     ? { $and: andCondition }
     : {};
 
-  const data = await Menu.find(whereCondition).skip(skip).limit(limit).lean();
+  const data = await Menu.find(whereCondition).populate('category').skip(skip).limit(limit).lean();
 
   const total = await Menu.countDocuments(whereCondition);
 
@@ -77,6 +80,12 @@ const createMenu = async (menuData: IMenu) => {
   let nextId = await generateMenuId();
   menuData.id = nextId;
   const menu = await Menu.create(menuData);
+  await NotificationService.createNotificationForEvent(
+    null,
+    NotificationType.ALL_USER,
+    NotificationEvents.NEW_ITEMS
+  );
+
   return menu;
 };
 

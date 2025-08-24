@@ -20,12 +20,25 @@ import { actualFilterField } from "@/utils/format-text.js";
 import { discountSearchableFields } from "./discount.constants.js";
 import { rangeEnd, rangeStart } from "@/constants/range.query.js";
 import { paginationHelpers } from "@/helper/paginationHelper.js";
+import { NotificationService } from "../notifications/notification.services.js";
+import { NotificationType } from "@/enums/notification-type.enum.js";
+import { NotificationEvents } from "../notifications/notification.constants.js";
+import { generateDiscountId } from "@/utils/discount-id.js";
 
 /**
  * Service functions for Discount operations
  */
 const createDiscount = async (payload: IDiscount) => {
-  return await Discount.create(payload);
+  payload.id = await generateDiscountId();
+  const discount = await Discount.create(payload);
+
+  await NotificationService.createNotificationForEvent(
+    null,
+    NotificationType.ALL_USER,
+    NotificationEvents.OFFER_OPENED
+  );
+
+  return discount;
 };
 
 const getDiscounts = async (
@@ -125,9 +138,11 @@ const applyDiscount = async (
     userId: user._id,
     discountId,
   });
-
+  if (discountTaken) throw new Error("Discount already taken");
+  
   const discountType = discount.type;
   const discountUsageData = {
+    userId: user._id,
     orderId,
     discountId,
     discountType,
@@ -136,7 +151,7 @@ const applyDiscount = async (
 
   if (
     discountType === DiscountType.NEW_USER &&
-    (await firstOrderOfferTaken(userId, discountId))
+    (await firstOrderOfferTaken(user._id, discountId))
   )
     throw new Error("First order discount already taken");
 
@@ -145,17 +160,16 @@ const applyDiscount = async (
   if (discountType === DiscountType.SEASONAL) {
     if (!isSessionalOfferValid(discount))
       throw new Error("Sessional discount already expired");
-    if (discountTaken) throw new Error("Discount already taken");
   }
 
-  if (discountType === DiscountType.PROMO_CODE) {
-    if (discountTaken) throw new Error("Discount already taken!");
-  }
+  // if (discountType === DiscountType.PROMO_CODE)
 
   discountUsageData["discountAmount"] = calcDiscount(
     order.totalPrice,
     discount.percentage
   );
+
+  console.log({discountUsageData})
   const newDiscountTaken = await DiscountUsage.create(discountUsageData);
 
   return newDiscountTaken;
@@ -181,6 +195,7 @@ const getAvailableDiscounts = async (id: string) => {
       isEligible = true;
 
     // Todo: for every level there will a row defining discount info
+    console.log(d);
     if (d.type === DiscountType.LEVEL_BASED) {
       if (user.level === d.level) isEligible = true;
     }

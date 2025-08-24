@@ -16,4 +16,11 @@ router.patch(
   AdminSettingsController.updateSetting
 );
 
+router.post(
+  "/",
+  auth(UserRole.ADMIN),
+  validateRequest(AdminSettingValidation.createSettingZodSchema),
+  AdminSettingsController.createSetting
+);
+
 export const AdminSettingsRoutes = router;

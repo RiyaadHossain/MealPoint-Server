@@ -1,6 +1,7 @@
 import { Schema, model } from "mongoose";
 import type { IDiscount, IDiscountUsage } from "./discount.interface.js";
 import { DiscountType } from "@/enums/discount.enum.js";
+import { UserLevel } from "@/enums/user.enum.js";
 
 // Discount schema definition
 const discountSchema = new Schema<IDiscount>(
@@ -15,8 +16,8 @@ const discountSchema = new Schema<IDiscount>(
     description: { type: String },
     percentage: { type: Number, required: true },
     flatAmount: { type: Number },
-    level: { type: String },
-    promoCode: { type: String, unique: true },
+    level: { type: String, enum: Object.values(UserLevel) },
+    promoCode: { type: String},
     maxUsagePerUser: { type: Number, default: 1 },
     maxUsageGlobal: { type: Number, default: 0 },
     startDate: { type: Date },

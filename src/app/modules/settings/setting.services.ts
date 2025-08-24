@@ -7,6 +7,13 @@ const getSetting = async (key: string): Promise<IAdminSetting | null> => {
   return AdminSettings.findOne({ key });
 };
 
+const createSetting = async (
+  key: string,
+  value: string
+): Promise<IAdminSetting> => {
+  return AdminSettings.create({ key, value });
+};
+
 const updateSetting = async (
   key: string,
   value: string
@@ -24,6 +31,7 @@ const getAllSettings = async (): Promise<IAdminSetting[]> => {
 
 export const AdminSettingsService = {
   getSetting,
+  createSetting,
   updateSetting,
   getAllSettings,
 };

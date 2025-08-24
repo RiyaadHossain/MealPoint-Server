@@ -2,7 +2,6 @@
 import { Notification } from "./notification.model.js";
 import type { INotification } from "./notification.interface.js";
 import type { NotificationType } from "@/enums/notification-type.enum.js";
-import mongoose from "mongoose";
 import type { IPaginationType } from "@/interfaces/paginaiton.js";
 import { paginationHelpers } from "@/helper/paginationHelper.js";
 import { User } from "../users/user.model.js";
@@ -18,7 +17,12 @@ const getNotifications = async (
     paginationHelpers.calculatePagination(paginationOptions);
 
   const user = await User.findOne({ id: userId });
-  const notifications = await Notification.find({ userId: user?._id })
+  const notifications = await Notification.find({
+    $or: [
+      { userId: user?._id, read: false }, // User-specific unread notifications
+      { type: "ALL_USER", read: false }, // All-user unread notifications
+    ],
+  })
     .sort({ createdAt: -1 })
     .skip(skip)
     .limit(limit)
@@ -65,19 +69,20 @@ const markAsRead = async (id: string) => {
  * Create a notification for a specific event
  */
 const createNotificationForEvent = async (
-  userId: string,
+  userId: any,
   type: NotificationType,
   event: { title: string; message: string }
 ) => {
   if (!event) throw new Error("Invalid notification event");
 
   const notification: Partial<INotification> = {
-    userId: new mongoose.Types.ObjectId(userId),
     type,
     title: event.title,
     message: event.message,
     read: false,
   };
+  if (userId) notification["userId"] = userId;
+
   return await Notification.create(notification);
 };
 

@@ -13,6 +13,9 @@ import { rangeEnd, rangeStart } from "@/constants/range.query.js";
 import { isMongoObjectId } from "@/utils/mongodb.js";
 import mongoose from "mongoose";
 import { Menu } from "../menus/menu.model.js";
+import { NotificationService } from "../notifications/notification.services.js";
+import { NotificationType } from "@/enums/notification-type.enum.js";
+import { NotificationEvents } from "../notifications/notification.constants.js";
 
 const createCombo = async (payload: Omit<ICombo, "id">) => {
   // Generate combo id
@@ -20,14 +23,21 @@ const createCombo = async (payload: Omit<ICombo, "id">) => {
 
   // Validate all menu items exist
   for (const comboItem of payload.items) {
-    const menuExists = await Menu.exists({ _id: comboItem.item });
-    if (!menuExists) {
+    const menuExists = await Menu.findById(comboItem.item);
+    if (!menuExists)
       throw new ApiError(
         httpStatus.BAD_REQUEST,
         `Menu item not found: ${comboItem.item}`
       );
-    }
+
+    comboItem.price = menuExists.price * comboItem.quantity;
   }
+
+  await NotificationService.createNotificationForEvent(
+    null,
+    NotificationType.ALL_USER,
+    NotificationEvents.NEW_ITEMS
+  );
 
   // Create combo
   return Combo.create({ ...payload, id });
@@ -83,7 +93,11 @@ const getCombos = async (
   const data = await Combo.find(whereCondition)
     .skip(skip)
     .limit(limit)
-    .populate("items.item")
+    .populate({
+      path: "items.item",
+      populate: { path: "category", select: "name description" },
+      select: "name id description price",
+    })
     .lean();
 
   const total = await Combo.countDocuments(whereCondition);
@@ -101,7 +115,12 @@ const getCombos = async (
 };
 
 const getComboById = async (id: string) => {
-  const combo = await Combo.findOne({ id }).populate("items.item");
+  const combo = await Combo.findOne({ id }).populate({
+    path: "items.item",
+    populate: { path: "category", select: "name description" },
+    select: "name id description price",
+  });
+
   if (!combo) throw new ApiError(httpStatus.NOT_FOUND, "Combo not found");
   return combo;
 };

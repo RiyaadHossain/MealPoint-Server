@@ -13,6 +13,17 @@ const getAllSettings = async (_req: Request, res: Response) => {
   });
 };
 
+const createSetting = async (req: Request, res: Response) => {
+  const { key, value } = req.body;
+  const updated = await AdminSettingsService.createSetting(key, value);
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: `${key} updated successfully`,
+    data: updated,
+  });
+};
+
 const updateSetting = async (req: Request, res: Response) => {
   const { key, value } = req.body;
   const updated = await AdminSettingsService.updateSetting(key, value);
@@ -24,4 +35,8 @@ const updateSetting = async (req: Request, res: Response) => {
   });
 };
 
-export const AdminSettingsController = { getAllSettings, updateSetting };
+export const AdminSettingsController = {
+  createSetting,
+  getAllSettings,
+  updateSetting,
+};

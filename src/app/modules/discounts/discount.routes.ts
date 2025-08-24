@@ -26,6 +26,13 @@ router.get(
   DiscountController.getDiscounts
 );
 
+// Get available discounts for user
+router.get(
+  "/available",
+  auth(UserRole.CUSTOMER),
+  DiscountController.getAvailableDiscounts
+);
+
 // Get a single discount by ID
 router.get(
   "/:id",
@@ -52,11 +59,5 @@ router.post(
   DiscountController.applyDiscount
 );
 
-// Get available discounts for user
-router.get(
-  "/available",
-  auth(UserRole.CUSTOMER),
-  DiscountController.getAvailableDiscounts
-);
 
-export default router;
+export const discountRoutes = router;

@@ -8,6 +8,7 @@ import { ComboController } from "./combo.controllers.js";
 const router = express.Router();
 
 router.get("/", ComboController.getCombos);
+router.get("/:id", ComboController.getComboById);
 router.post(
   "/",
   validateRequest(createComboSchema),

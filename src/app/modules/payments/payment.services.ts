@@ -18,6 +18,10 @@ import { PaymentStatus } from "@/enums/payment.enum.js";
 import { OrderStatus } from "@/enums/order.enum.js";
 import config from "@/config/index.js";
 import { stripe } from "@/config/payment.js";
+import { NotificationService } from "../notifications/notification.services.js";
+import { getAdminsId } from "../auth/auth.utils.js";
+import { NotificationType } from "@/enums/notification-type.enum.js";
+import { NotificationEvents } from "../notifications/notification.constants.js";
 
 const createPayment = async (userId: string, payload: any) => {
   // 1️⃣ Validate order
@@ -37,7 +41,8 @@ const createPayment = async (userId: string, payload: any) => {
   const line_items = orderItems.map((item: any) => {
     const name = item.menuItemId.name || item.comboItemId.name;
     const images = item.menuItemId.image || item.comboItemId.image;
-    const description =  item.menuItemId.description ||  item.comboItemId.description
+    const description =
+      item.menuItemId.description || item.comboItemId.description;
 
     return {
       price_data: {
@@ -97,9 +102,10 @@ const updatePaymentStatus = async (
 ) => {
   // 1. Find payment
   const payment = await Payment.findById(id);
-  if (!payment) {
-    throw new ApiError(httpStatus.NOT_FOUND, "Payment not found");
-  }
+  if (!payment) throw new ApiError(httpStatus.NOT_FOUND, "Payment not found");
+
+  const order = await Order.findById(payment.orderId);
+  if (!order) throw new ApiError(httpStatus.NOT_FOUND, "Order not found");
 
   // 2. Prevent updating if final state
   const finalStatus = [
@@ -123,6 +129,28 @@ const updatePaymentStatus = async (
     await Order.findByIdAndUpdate(payment.orderId, {
       status: OrderStatus.PAID,
     });
+
+    const adminsId = await getAdminsId();
+
+    await Promise.all(
+      adminsId.map(async (adminId) => {
+        // create notification for admin
+        await NotificationService.createNotificationForEvent(
+          adminId,
+          NotificationType.ADMIN_EVENT,
+          {
+            title: "Payment Confirmed 💳",
+            message: `Payment successful for order id: ${order.id}`,
+          }
+        );
+      })
+    );
+
+    await NotificationService.createNotificationForEvent(
+      order.user,
+      NotificationType.USER_EVENT,
+      NotificationEvents.PAYMENT_SUCCESS
+    );
   }
 
   const session = await stripe.checkout.sessions.retrieve(payload.session_id);

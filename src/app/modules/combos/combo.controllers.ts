@@ -33,6 +33,18 @@ const createCombo = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+ const getComboById = catchAsync(async (req: Request, res: Response) => {
+  const comboId = req.params?.['id'] as string
+  const data = await ComboService.getComboById(comboId);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Combos retrieved successfully",
+    data
+  });
+});
+
  const updateCombo = catchAsync(async (req: Request, res: Response) => {
   const id = req.params["id"] as string;
   const combo = await ComboService.updateCombo(id, req.body);
@@ -57,6 +69,7 @@ const createCombo = catchAsync(async (req: Request, res: Response) => {
 
 export const ComboController = {
   createCombo,
+  getComboById,
   getCombos,
   updateCombo,
   deleteCombo,
