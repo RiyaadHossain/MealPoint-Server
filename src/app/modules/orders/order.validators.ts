@@ -14,9 +14,8 @@ export const createOrderSchema = z.object({
     discount: z.string().optional(),
     type: z.enum(Object.values(OrderType)),
     deliveryAddress: z.string().optional(),
-    payment: z.string().optional(),
+    discountIds: z.array(z.string()),
     notes: z.string().optional(),
-    placedAt: z.date().optional(),
     items: z
       .array(orderItemSchema)
       .min(1, "At least one order item is required"),
@@ -28,9 +27,7 @@ export const updateOrderSchema = z.object({
     discount: z.string().optional(),
     type: z.enum(Object.values(OrderType)).optional(),
     deliveryAddress: z.string().optional(),
-    payment: z.string().optional(),
     notes: z.string().optional(),
-    placedAt: z.date().optional(),
     items: z
       .array(orderItemSchema)
       .min(1, "At least one order item is required")

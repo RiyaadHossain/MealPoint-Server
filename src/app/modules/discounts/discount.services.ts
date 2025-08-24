@@ -1,5 +1,8 @@
 import { User } from "../users/user.model.js";
-import type { IDiscount, IDiscountFilterOptoins } from "./discount.interface.js";
+import type {
+  IDiscount,
+  IDiscountFilterOptoins,
+} from "./discount.interface.js";
 import { Discount, DiscountUsage } from "./discount.model.js";
 import { DiscountType } from "@/enums/discount.enum.js";
 import {
@@ -12,7 +15,7 @@ import {
 import { Order } from "../orders/order.model.js";
 import type { IPaginationType } from "@/interfaces/paginaiton.js";
 import { isMongoObjectId } from "@/utils/mongodb.js";
-import mongoose, { type SortOrder } from "mongoose";
+import mongoose, { Types, type SortOrder } from "mongoose";
 import { actualFilterField } from "@/utils/format-text.js";
 import { discountSearchableFields } from "./discount.constants.js";
 import { rangeEnd, rangeStart } from "@/constants/range.query.js";
@@ -29,64 +32,67 @@ const getDiscounts = async (
   paginationOptions: IPaginationType,
   filtersOptions: IDiscountFilterOptoins
 ) => {
-    // Pagination Options
-    const { skip, page, limit, sortBy, sortOrder } =
-      paginationHelpers.calculatePagination(paginationOptions);
-  
-    // Sort condition
-    const sortCondition: { [key: string]: SortOrder } = {};
-    sortCondition[sortBy] = sortOrder;
-  
-    // Filter Options
-    const { searchTerm, ...filtersData } = filtersOptions;
-  
-    const andCondition = [];
-    if (searchTerm) {
-      andCondition.push({
-        $or: discountSearchableFields.map((field) => ({
-          [field]: { $regex: searchTerm, $options: "i" },
-        })),
-      });
-    }
-  
-    if (Object.keys(filtersData).length) {
-      andCondition.push({
-        $and: Object.entries(filtersData).map(([field, value]) => {
-          // Handle range queries
-          if (field.startsWith(rangeStart))
-            return { [actualFilterField(field, rangeStart)]: { $gte: value } };
-  
-          if (field.startsWith(rangeEnd))
-            return { [actualFilterField(field, rangeEnd)]: { $lte: value } };
-  
-          // Handle ObjectId Query
-          if (isMongoObjectId(value))
-            // @ts-ignore
-            return { [field]: new mongoose.Types.ObjectId(value) };
-  
-          return { [field]: value };
-        }),
-      });
-    }
-  
-    const whereCondition = Object.keys(andCondition).length
-      ? { $and: andCondition }
-      : {};
-  
-    const data = await Discount.find(whereCondition).skip(skip).limit(limit).lean();
-  
-    const total = await Discount.countDocuments(whereCondition);
-  
-    const response = {
-      data,
-      metaData: {
-        total,
-        page,
-        limit,
-      },
-    };
-  
-    return response;
+  // Pagination Options
+  const { skip, page, limit, sortBy, sortOrder } =
+    paginationHelpers.calculatePagination(paginationOptions);
+
+  // Sort condition
+  const sortCondition: { [key: string]: SortOrder } = {};
+  sortCondition[sortBy] = sortOrder;
+
+  // Filter Options
+  const { searchTerm, ...filtersData } = filtersOptions;
+
+  const andCondition = [];
+  if (searchTerm) {
+    andCondition.push({
+      $or: discountSearchableFields.map((field) => ({
+        [field]: { $regex: searchTerm, $options: "i" },
+      })),
+    });
+  }
+
+  if (Object.keys(filtersData).length) {
+    andCondition.push({
+      $and: Object.entries(filtersData).map(([field, value]) => {
+        // Handle range queries
+        if (field.startsWith(rangeStart))
+          return { [actualFilterField(field, rangeStart)]: { $gte: value } };
+
+        if (field.startsWith(rangeEnd))
+          return { [actualFilterField(field, rangeEnd)]: { $lte: value } };
+
+        // Handle ObjectId Query
+        if (isMongoObjectId(value))
+          // @ts-ignore
+          return { [field]: new mongoose.Types.ObjectId(value) };
+
+        return { [field]: value };
+      }),
+    });
+  }
+
+  const whereCondition = Object.keys(andCondition).length
+    ? { $and: andCondition }
+    : {};
+
+  const data = await Discount.find(whereCondition)
+    .skip(skip)
+    .limit(limit)
+    .lean();
+
+  const total = await Discount.countDocuments(whereCondition);
+
+  const response = {
+    data,
+    metaData: {
+      total,
+      page,
+      limit,
+    },
+  };
+
+  return response;
 };
 
 const getDiscountById = async (id: string) => {
@@ -102,9 +108,8 @@ const deleteDiscount = async (id: string) => {
 };
 
 const applyDiscount = async (
-  orderId: string,
-  discountId: string,
-  discountType: DiscountType,
+  orderId: Types.ObjectId,
+  discountId: string[],
   userId: string
 ) => {
   const user = await User.findOne({ id: userId });
@@ -121,6 +126,7 @@ const applyDiscount = async (
     discountId,
   });
 
+  const discountType = discount.type;
   const discountUsageData = {
     orderId,
     discountId,
@@ -134,7 +140,7 @@ const applyDiscount = async (
   )
     throw new Error("First order discount already taken");
 
-  // if (discountType === DiscountType.LEVEL_BASED)
+  // No Limitations for level-based discount
 
   if (discountType === DiscountType.SEASONAL) {
     if (!isSessionalOfferValid(discount))

@@ -17,6 +17,10 @@ import { NotificationService } from "../notifications/notification.services.js";
 import { getAdminsId } from "../auth/auth.utils.js";
 import { NotificationType } from "@/enums/notification-type.enum.js";
 import { NotificationEvents } from "../notifications/notification.constants.js";
+import { DiscountService } from "../discounts/discount.services.js";
+import ApiError from "@/errors/ApiError.js";
+import httpStatus from "http-status"
+import { getTaxAmount } from "./order.utils.js";
 
 /**
  * Get paginated and filtered orders
@@ -121,7 +125,10 @@ const getOrdersByCustomerId = async (customerId: string) => {
 /**
  * Create a new order
  */
-const createOrder = async (userId: string, orderData: IOrder) => {
+const createOrder = async (
+  userId: string,
+  orderData: IOrder & { discountId: string[] }
+) => {
   // check if user exists
   const userExists = await User.exists({ id: userId });
   if (!userExists) throw new Error("User not found");
@@ -148,18 +155,22 @@ const createOrder = async (userId: string, orderData: IOrder) => {
     })
   );
 
-  /*
-   * check discount and apply if any
-   * calculate net price etc.
-   * calc tax
-  */
-
   orderData.id = await generateOrderId();
   orderData.totalPrice = totalPrice;
-  orderData.netPrice = totalPrice; // apply discount logic if needed
   orderData.user = userExists._id;
 
   const order = await Order.create(orderData);
+  if(!order) throw new ApiError(httpStatus.BAD_REQUEST, "Internal Server Error")
+
+  let discountAmount = 0;
+  if (orderData.discountId) { 
+    const discount = await DiscountService.applyDiscount(order._id, orderData.discountId, userId)
+    discountAmount = discount.discountAmount
+    order.discount = discount._id
+  }
+
+  order.netPrice = totalPrice - discountAmount; 
+  order.netPrice += await getTaxAmount(order.netPrice);
 
   // create order items
   await Promise.all(

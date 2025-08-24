@@ -72,11 +72,10 @@ const deleteDiscount = async (req: Request, res: Response) => {
 
 const applyDiscount = async (req: Request, res: Response) => {
   const userId = req?.user?.["id"];
-  const { orderId, discountId, discountType } = req.body;
+  const { orderId, discountId } = req.body;
   const result = await DiscountService.applyDiscount(
     orderId,
     discountId,
-    discountType,
     userId
   );
   sendResponse(res, {
