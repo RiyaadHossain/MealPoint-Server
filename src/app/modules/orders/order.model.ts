@@ -6,6 +6,7 @@ import { OrderItemType, OrderStatus, OrderType } from "@/enums/order.enum.js";
 const OrderItemSchema = new Schema<IOrderItem>({
   orderId: { type: Schema.Types.ObjectId, ref: "Order", required: true },
   menuItemId: { type: Schema.Types.ObjectId, ref: "Menu", required: true },
+  comboItemId: { type: Schema.Types.ObjectId, ref: "Menu", required: true },
   quantity: { type: Number, required: true },
   price: { type: Number, required: true },
   type: {

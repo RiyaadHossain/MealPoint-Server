@@ -10,7 +10,7 @@ import { actualFilterField } from "@/utils/format-text.js";
 import { rangeEnd, rangeStart } from "@/constants/range.query.js";
 import { isMongoObjectId } from "@/utils/mongodb.js";
 import mongoose from "mongoose";
-import { Order } from "../orders/order.model.js";
+import { Order, OrderItem } from "../orders/order.model.js";
 import ApiError from "@/errors/ApiError.js";
 import httpStatus from "http-status";
 import { User } from "../users/user.model.js";
@@ -23,11 +23,9 @@ const createPayment = async (userId: string, payload: any) => {
   // 1️⃣ Validate order
   const order = await Order.findById(payload.orderId);
   if (!order) throw new ApiError(httpStatus.NOT_FOUND, "Order not found");
-
-  // Optional: validate amount
-  if (order.totalPrice !== payload.amount) {
-    throw new ApiError(httpStatus.BAD_REQUEST, "Amount mismatch");
-  }
+  const orderItems = await OrderItem.find({ orderId: order._id }).populate(
+    "menuItemId comboItemId"
+  );
 
   // 2️⃣ Validate user
   const user = await User.findOne({ id: userId });
@@ -36,20 +34,24 @@ const createPayment = async (userId: string, payload: any) => {
   // 3️⃣ Generate transaction reference
   const transactionId = `txn_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
 
-  //  Initialize Stripe
+  const line_items = orderItems.map((item: any) => {
+    const name = item.menuItemId.name || item.comboItemId.name;
+    const images = item.menuItemId.image || item.comboItemId.image;
+    const description =  item.menuItemId.description ||  item.comboItemId.description
 
-  const line_items = order.items.map((item: any) => ({
-    price_data: {
-      currency: "usd", // optionally make dynamic per restaurant
-      product_data: {
-        name: item.name,
-        images: [item.image || ""],
-        description: item.description || "",
+    return {
+      price_data: {
+        currency: "usd", // optionally make dynamic per restaurant
+        product_data: {
+          name,
+          images,
+          description,
+        },
+        unit_amount: Math.round(item.price * 100), // amount in cents
       },
-      unit_amount: Math.round(item.price * 100), // amount in cents
-    },
-    quantity: item.quantity,
-  }));
+      quantity: item.quantity,
+    };
+  });
 
   // 4️⃣ Create Checkout Session
   const session = await stripe.checkout.sessions.create({

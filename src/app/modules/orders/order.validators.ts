@@ -3,7 +3,8 @@ import { z } from "zod";
 import { OrderItemType, OrderStatus, OrderType } from "@/enums/order.enum.js";
 
 const orderItemSchema = z.object({
-  menuItemId: z.string().min(1),
+  menuItemId: z.string().min(1).optional(),
+  comboItemId: z.string().min(1).optional(),
   quantity: z.number().min(1),
   type: z.enum(Object.values(OrderItemType)),
 });

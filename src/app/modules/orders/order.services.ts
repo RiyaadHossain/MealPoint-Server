@@ -141,7 +141,7 @@ const createOrder = async (
       if (item.type === OrderItemType.MENU)
         itemExists = await Menu.findById(item.menuItemId);
       if (item.type === OrderItemType.COMBO)
-        itemExists = await Combo.findById(item.menuItemId);
+        itemExists = await Combo.findById(item.comboItemId);
 
       if (!itemExists)
         throw new Error(`Menu item ${item.menuItemId} not found`);

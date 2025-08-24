@@ -9,6 +9,7 @@ import type { Types } from "mongoose";
 export interface IOrderItem {
   orderId: Types.ObjectId;
   menuItemId: Types.ObjectId;
+  comboItemId: Types.ObjectId;
   quantity: number;
   price: number;
   type: OrderItemType;
