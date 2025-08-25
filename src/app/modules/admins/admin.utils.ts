@@ -16,7 +16,7 @@ export const generateLabels = (
   const labels: string[] = [];
   const today = new Date();
 
-  for (let i = range - 1; i >= 0; i--) {
+  for (let i = 0; i < range; i++) {
     if (period === "month") {
       labels.push(format(subMonths(today, i), "MMM yyyy"));
     } else if (period === "day") {

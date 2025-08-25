@@ -11,6 +11,7 @@ const getStatistics = async () => {
   const totalCombos = await Combo.countDocuments();
   const totalOrders = await Order.countDocuments();
   const totalSales = await Order.aggregate([
+    { $match: { status: OrderStatus.PAID } },
     { $group: { _id: null, sum: { $sum: "$totalPrice" } } },
   ]);
 
@@ -40,19 +41,19 @@ const getSalesSummary = async (startDate: string, endDate: string) => {
     {
       $group: {
         _id: null,
-        totalSales: { $sum: "$netPrice" },
+        totalSales: { $sum: "$totalPrice" },
       },
     },
   ]);
   const totalSales = totalSalesResult[0]?.totalSales || 0;
 
   if (isNaN(start.getTime()) || isNaN(end.getTime())) {
-  throw new Error("Invalid date range");
-}
+    throw new Error("Invalid date range");
+  }
 
   /** 2. TOTAL ORDERS */
   const totalOrders = await Order.countDocuments({
-    placedAt: { '$gte': start, '$lte': end },
+    placedAt: { $gte: start, $lte: end },
     status: { $ne: OrderStatus.CANCELLED },
   });
 
@@ -122,12 +123,12 @@ const getSalesSummary = async (startDate: string, endDate: string) => {
       $match: {
         "order.placedAt": { $gte: start, $lte: end },
         "order.status": { $ne: OrderStatus.CANCELLED },
-        type: OrderItemType.COMBO, 
+        type: OrderItemType.COMBO,
       },
     },
     {
       $group: {
-        _id: "$menuItemId", // comboId
+        _id: "$comboItemId",
         unitsSold: { $sum: "$quantity" },
         revenue: { $sum: { $multiply: ["$quantity", "$price"] } },
       },
@@ -203,14 +204,14 @@ const getSalesOrdersStatistics = async (
         {
           $match: {
             placedAt: { $gte: startDate, $lte: endDate },
-            status: { $ne: OrderStatus.CANCELLED },
+            status: OrderStatus.PAID,
           },
         },
         {
           $group: {
             _id: null,
             orders: { $sum: 1 },
-            sales: { $sum: "$netPrice" },
+            sales: { $sum: "$totalPrice" },
           },
         },
       ]);
