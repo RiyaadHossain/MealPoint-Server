@@ -39,17 +39,17 @@ const createPayment = async (userId: string, payload: any) => {
   const transactionId = `txn_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
 
   const line_items = orderItems.map((item: any) => {
-    const name = item.menuItemId.name || item.comboItemId.name;
-    const images = item.menuItemId.image || item.comboItemId.image;
+    const name = item?.menuItemId?.name || item?.comboItemId?.name;
+    const images = item?.menuItemId?.image || item?.comboItemId?.image;
     const description =
-      item.menuItemId.description || item.comboItemId.description;
+      item?.menuItemId?.description || item?.comboItemId?.description;
 
     return {
       price_data: {
         currency: "usd", // optionally make dynamic per restaurant
         product_data: {
           name,
-          images,
+          images: [images],
           description,
         },
         unit_amount: Math.round(item.price * 100), // amount in cents
@@ -60,11 +60,12 @@ const createPayment = async (userId: string, payload: any) => {
 
   // 4️⃣ Create Checkout Session
   const session = await stripe.checkout.sessions.create({
-    ui_mode: "embedded", // Embedded checkout
+    ui_mode: "custom", // Custom checkout
     line_items,
     mode: "payment",
-    success_url: `${config.CLIENT_URL}/payment-success?session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: `${config.CLIENT_URL}/payment-cancel`,
+    return_url: `${config.CLIENT_URL}/payment-success?session_id={CHECKOUT_SESSION_ID}`,
+    // success_url: `${config.CLIENT_URL}/payment-success?session_id={CHECKOUT_SESSION_ID}`,
+    // cancel_url: `${config.CLIENT_URL}/payment-cancel`,
   });
 
   // 5️⃣ Save payment record in your DB
@@ -88,8 +89,6 @@ const createPayment = async (userId: string, payload: any) => {
     },
   };
 };
-
-export default createPayment;
 
 const getPaymentById = async (id: string) => {
   const payment = await Payment.findById(id).populate("userId orderId");
@@ -121,7 +120,10 @@ const updatePaymentStatus = async (
   }
 
   // 3. Update payment status
-  payment.status = payload.status;
+  payment.status =
+    payload.status === PaymentStatus.SUCCESS
+      ? PaymentStatus.SUCCESS
+      : PaymentStatus.FAILED;
   await payment.save();
 
   // 4. Update order if payment is completed
@@ -206,6 +208,7 @@ const getAllPayments = async (
     : {};
 
   const data = await Payment.find(whereCondition)
+    .populate("userId orderId")
     .skip(skip)
     .limit(limit)
     .lean();

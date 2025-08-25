@@ -28,7 +28,7 @@ router.get(
 
 router.patch(
   "/:id/status",
-  auth(UserRole.ADMIN),
+  auth(UserRole.ADMIN, UserRole.CUSTOMER),
   validateRequest(updatePaymentStatusSchema),
   PaymentController.updatePaymentStatus
 );

@@ -169,9 +169,7 @@ const applyDiscount = async (
     discount.percentage
   );
 
-  console.log({discountUsageData})
   const newDiscountTaken = await DiscountUsage.create(discountUsageData);
-
   return newDiscountTaken;
 };
 
@@ -187,15 +185,12 @@ const getAvailableDiscounts = async (id: string) => {
   for (let d of discounts) {
     let isEligible = false;
 
-    // Todo: for first order there will a row in the table
     if (
       d.type === DiscountType.NEW_USER &&
       (await isFirstOrderOfferAvailable(userId, d._id))
     )
       isEligible = true;
 
-    // Todo: for every level there will a row defining discount info
-    console.log(d);
     if (d.type === DiscountType.LEVEL_BASED) {
       if (user.level === d.level) isEligible = true;
     }
