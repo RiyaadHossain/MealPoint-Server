@@ -6,7 +6,8 @@ import dotenv from "./config/index.js";
 async function startServer() {
   await connectDB();
 
-  app.listen(dotenv.PORT, () => {
+  const PORT = dotenv.PORT || 3000;
+  app.listen(PORT, () => {
     console.log(`✅ Server listening on PORT:${dotenv.PORT}`);
   });
 }
