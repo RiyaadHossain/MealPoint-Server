@@ -4,18 +4,12 @@ import helmet from "helmet";
 import { errorHandler } from "app/middlewares/error-middleware.js";
 import router from "app/routes/index.js";
 import { notFoundHandler } from "app/middlewares/not-found.js";
+import { corsOptions } from "./config/cors.js";
 
 const app = express();
 
 // Middleware setup
-app.use(
-  cors({
-    origin: ["http://localhost:3000"], // Adjust this in production to your client's domain
-    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-    credentials: true,
-  })
-);
-
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use(helmet()); // Security headers
 
