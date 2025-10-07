@@ -8,7 +8,9 @@ import { notFoundHandler } from "app/middlewares/not-found.js";
 const app = express();
 
 // Middleware setup
-app.use(cors());
+app.use(cors({
+  origin: "*"
+}));
 app.use(express.json());
 app.use(helmet()); // Security headers
 
@@ -19,7 +21,9 @@ app.use(helmet()); // Security headers
 app.use('/api/v1/', router);
 
 // Simple health check route
-app.get("/health", (_req, res) => res.send("OK"));
+app.get("/", (_req, res) => {
+  res.send("✅ API is running!");
+});
 
 //handle not found
 app.use(notFoundHandler);

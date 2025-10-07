@@ -23,6 +23,7 @@ import { getAdminsId } from "../auth/auth.utils.js";
 import { NotificationType } from "@/enums/notification-type.enum.js";
 import { NotificationEvents } from "../notifications/notification.constants.js";
 
+// Stripe Doc: https://docs.stripe.com/payments/accept-a-payment?platform=web&ui=embedded-components
 const createPayment = async (userId: string, payload: any) => {
   // 1️⃣ Validate order
   const order = await Order.findById(payload.orderId);

@@ -2,11 +2,12 @@ import app from "./app.js";
 import { connectDB } from "./config/db.js";
 import dotenv from "./config/index.js";
 
+
 async function startServer() {
   await connectDB();
 
   app.listen(dotenv.PORT, () => {
-    console.log(`✅ Server listening on http://localhost:${dotenv.PORT}`);
+    console.log(`✅ Server listening on PORT:${dotenv.PORT}`);
   });
 }
 

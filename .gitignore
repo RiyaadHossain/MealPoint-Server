@@ -47,3 +47,4 @@ pids
 
 # TypeScript cache
 *.tsbuildinfo
+.vercel
