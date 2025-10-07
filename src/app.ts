@@ -8,9 +8,14 @@ import { notFoundHandler } from "app/middlewares/not-found.js";
 const app = express();
 
 // Middleware setup
-app.use(cors({
-  origin: "*"
-}));
+app.use(
+  cors({
+    origin: ["*"], // Adjust this in production to your client's domain
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+    credentials: true,
+  })
+);
+
 app.use(express.json());
 app.use(helmet()); // Security headers
 
@@ -18,7 +23,7 @@ app.use(helmet()); // Security headers
 // updateMenuCategories()
 
 // Routes
-app.use('/api/v1/', router);
+app.use("/api/v1/", router);
 
 // Simple health check route
 app.get("/", (_req, res) => {
