@@ -10,8 +10,8 @@ const app = express();
 // Middleware setup
 app.use(
   cors({
-    origin: ["http://localhost:3000/"], // Adjust this in production to your client's domain
-    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+    origin: ["http://localhost:3000"], // Adjust this in production to your client's domain
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
     credentials: true,
   })
 );
