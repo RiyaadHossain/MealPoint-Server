@@ -3,6 +3,7 @@ import { Router } from "express";
 import {
   loginSchema,
   registerSchema,
+  socialLoginSchema,
   updateSchema,
 } from "./auth.validators.js";
 import { AuthController } from "./auth.controllers.js";
@@ -17,8 +18,8 @@ router.post(
   AuthController.register
 );
 
-// POST /auth/login
 router.post("/login", validateRequest(loginSchema), AuthController.login);
+router.post("/social-login", validateRequest(socialLoginSchema), AuthController.socialLogin);
 
 router.get(
   "/profile",

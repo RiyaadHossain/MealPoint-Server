@@ -12,5 +12,6 @@ export default {
   JWT_EXPIRATION: process.env.JWT_EXPIRATION || "1h",
   SALT_ROUNDS: parseInt(process.env.SALT_ROUNDS || "10", 10),
   STRIPE_API_KEY: process.env.STRIPE_API_KEY,
-  CLIENT_URL: process.env.CLIENT_URL
+  CLIENT_URL: process.env.CLIENT_URL,
+  SOCIAL_LOGIN_PASSWORD: process.env.SOCIAL_LOGIN_PASSWORD ,
 };

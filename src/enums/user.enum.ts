@@ -9,3 +9,10 @@ export enum UserLevel {
   GOLD = "gold",
   PLATINUM = "platinum",
 }
+
+export enum AuthProvider {
+  GOOGLE = "google",
+  FACEBOOK = "facebook",
+  GITHUB = "github",
+  LOCAL = "local",
+}

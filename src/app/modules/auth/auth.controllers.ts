@@ -31,6 +31,18 @@ const login = catchAsync(async (req, res) => {
   sendResponse(res, responseData);
 });
 
+const socialLogin = catchAsync(async (req, res) => {
+  const userData = req.body;
+  const user = await AuthService.socialLogin(userData);
+  const responseData = {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "User logged in successfully",
+    data: user,
+  };
+  sendResponse(res, responseData);
+});
+
 const getProfile = catchAsync(async (req, res) => {
   const userId = req?.user?.["id"];
   const user = await AuthService.getProfile(userId);
@@ -63,6 +75,7 @@ const updateProfile = catchAsync(async (req, res) => {
 export const AuthController = {
   register,
   login,
+  socialLogin,
   getProfile,
   updateProfile,
 };

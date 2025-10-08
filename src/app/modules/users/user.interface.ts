@@ -1,4 +1,4 @@
-import { UserRole, UserLevel } from "@/enums/user.enum.js";
+import { UserRole, UserLevel, AuthProvider } from "@/enums/user.enum.js";
 import { Document, Model } from "mongoose";
 
 export interface IUser extends Document {
@@ -13,6 +13,7 @@ export interface IUser extends Document {
   level: UserLevel;
   loyaltyPoints: number;
   targetPoints: number;
+  provider?: AuthProvider;
   verified: boolean;
   createdAt?: Date;
   updatedAt?: Date;

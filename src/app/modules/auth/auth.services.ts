@@ -10,21 +10,19 @@ import { NotificationType } from "@/enums/notification-type.enum.js";
 import { NotificationEvents } from "../notifications/notification.constants.js";
 import { getAdminsId } from "./auth.utils.js";
 import ApiError from "@/errors/ApiError.js";
-import httpStatus from "http-status"
+import httpStatus from "http-status";
 
 const register = async (userData: IUser) => {
   const { email, role } = userData;
 
   const existingUser = await User.findOne({ email });
-  if (existingUser) {
-    throw new Error("Email already registered");
-  }
+  if (existingUser) throw new Error("Email already registered");
 
   // Generate a unique user ID
   userData.id = await generateUserId(role);
 
   const user = await User.create(userData);
-  if(!user) throw new ApiError(httpStatus.BAD_REQUEST, "User not found")
+  if (!user) throw new ApiError(httpStatus.BAD_REQUEST, "User not found");
 
   // @ts-ignore
   const userId = user._id.toString();
@@ -74,6 +72,24 @@ const login = async (credential: ILoginCridential) => {
   return { user, token };
 };
 
+const socialLogin = async (userData: IUser) => {
+  const { email, provider } = userData;
+  userData.password = config.SOCIAL_LOGIN_PASSWORD as string;
+
+  let user = await register(userData).catch(() => null);
+
+  if (!user) {
+    user = await User.findOne({ email, provider });
+    if (!user) throw new Error("User not found. Please register first.");
+  }
+
+  const logInData = await login({
+    email,
+    password: config.SOCIAL_LOGIN_PASSWORD as string,
+  });
+  return logInData;
+};
+
 const getProfile = async (userId: string) => {
   const user = await User.findOne({ id: userId });
   if (!user) {
@@ -110,6 +126,7 @@ const updateProfile = async (userId: string, updateData: Partial<IUser>) => {
 export const AuthService = {
   register,
   login,
+  socialLogin,
   getProfile,
   updateProfile,
 };

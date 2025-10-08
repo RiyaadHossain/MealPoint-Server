@@ -10,6 +10,7 @@ declare namespace NodeJS {
     JWT_EXPIRATION?: string;
     SALT_ROUNDS?: string;
     STRIPE_API_KEY?: string;
-    CLIENT_URL: string
+    CLIENT_URL: string;
+    SOCIAL_LOGIN_PASSWORD: string;
   }
 }
