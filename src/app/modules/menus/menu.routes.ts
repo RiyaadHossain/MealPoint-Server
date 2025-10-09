@@ -9,6 +9,9 @@ const router = Router();
 // GET /menu?startPrice=500&endPrice=1000&category="Burgers"
 router.get("/", MenuController.getMenus);
 
+// Get menu details by ID
+router.get("/:id", MenuController.getMenuDetails);
+
 // Only admin can access these routes
 router.post(
   "/",

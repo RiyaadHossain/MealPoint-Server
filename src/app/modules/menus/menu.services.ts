@@ -12,6 +12,8 @@ import { menuSearchableFields } from "./menu.constants.js";
 import { NotificationService } from "../notifications/notification.services.js";
 import { NotificationType } from "@/enums/notification-type.enum.js";
 import { NotificationEvents } from "../notifications/notification.constants.js";
+import ApiError from "@/errors/ApiError.js";
+import httpStatus from "http-status";
 
 const getMenus = async (
   paginationOptions: IPaginationType,
@@ -60,7 +62,11 @@ const getMenus = async (
     ? { $and: andCondition }
     : {};
 
-  const data = await Menu.find(whereCondition).populate('category').skip(skip).limit(limit).lean();
+  const data = await Menu.find(whereCondition)
+    .populate("category")
+    .skip(skip)
+    .limit(limit)
+    .lean();
 
   const total = await Menu.countDocuments(whereCondition);
 
@@ -115,9 +121,17 @@ const deleteMenu = async (menuId: string) => {
   return null;
 };
 
+const getMenuDetails = async (id: string) => {
+  const menu = await Menu.findById(id).populate("category");
+  if (!menu) throw new ApiError(httpStatus.NOT_FOUND, "Menu not found");
+
+  return menu;
+};
+
 export const MenuService = {
   getMenus,
   createMenu,
   updateMenu,
   deleteMenu,
+  getMenuDetails,
 };

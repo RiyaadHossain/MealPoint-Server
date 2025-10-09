@@ -59,9 +59,22 @@ const deleteMenu = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const getMenuDetails = catchAsync(async (req: Request, res: Response) => {
+  const menuId = req.params["id"] as string;
+  const menu = await MenuService.getMenuDetails(menuId);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "Menu details retrieved successfully",
+    data: menu,
+  });
+});
+
 export const MenuController = {
   getMenus,
   createMenu,
   updateMenu,
   deleteMenu,
+  getMenuDetails,
 };
