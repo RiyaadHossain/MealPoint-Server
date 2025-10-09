@@ -11,9 +11,11 @@ import { NotificationEvents } from "../notifications/notification.constants.js";
 import { getAdminsId } from "./auth.utils.js";
 import ApiError from "@/errors/ApiError.js";
 import httpStatus from "http-status";
+import { UserRole } from "@/enums/user.enum.js";
 
 const register = async (userData: IUser) => {
-  const { email, role } = userData;
+  const role = UserRole.CUSTOMER
+  const { email } = userData;
 
   const existingUser = await User.findOne({ email });
   if (existingUser) throw new Error("Email already registered");

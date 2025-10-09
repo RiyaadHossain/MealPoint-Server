@@ -5,7 +5,6 @@ export const registerSchema = z.object({
   body: z.object({
     name: z.string().min(1).max(100),
     email: z.email(),
-    role: z.enum(UserRole),
     password: z.string().min(6),
     phone: z.string().optional(),
     address: z.string().optional(),
@@ -34,7 +33,6 @@ export const socialLoginSchema = z.object({
 export const updateSchema = z.object({
   body: z.object({
     name: z.string().min(1).max(100).optional(),
-    role: z.enum(UserRole).optional(),
     phone: z.string().optional(),
     address: z.string().optional(),
     profileImage: z.url().optional(),
