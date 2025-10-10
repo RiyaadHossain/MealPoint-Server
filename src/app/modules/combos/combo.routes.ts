@@ -8,8 +8,8 @@ import { ComboController } from "./combo.controllers.js";
 const router = express.Router();
 
 router.get("/", ComboController.getCombos);
-router.get("/:id", ComboController.getComboById);
-router.get("/slug/:slug", ComboController.getComboDetailsBySlug); // New route for getting combo details by slug
+router.get("/id/:id", ComboController.getComboById);
+router.get("/:slug", ComboController.getComboDetailsBySlug); // New route for getting combo details by slug
 router.post(
   "/",
   validateRequest(createComboSchema),
