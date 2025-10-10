@@ -128,10 +128,17 @@ const getMenuDetails = async (id: string) => {
   return menu;
 };
 
+const getMenuDetailsBySlug = async (slug: string) => {
+  const menu = await Menu.findOne({ slug }).populate("category");
+  if (!menu) throw new ApiError(httpStatus.NOT_FOUND, "Menu not found");
+  return menu;
+}
+
 export const MenuService = {
   getMenus,
   createMenu,
   updateMenu,
   deleteMenu,
   getMenuDetails,
+  getMenuDetailsBySlug,
 };

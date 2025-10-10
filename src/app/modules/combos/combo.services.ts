@@ -154,10 +154,22 @@ const deleteCombo = async (id: string) => {
   const combo = await Combo.findOneAndDelete({ id });
   return combo;
 };
+
+const getComboDetailsBySlug = async (slug: string) => {
+  const combo = await Combo.findOne({ slug }).populate({
+    path: "items.item",
+    populate: { path: "category", select: "name description" },
+    select: "name id description price",
+  });
+  if (!combo) throw new ApiError(httpStatus.NOT_FOUND, "Combo not found");
+  return combo;
+};
+
 export const ComboService = {
   createCombo,
   getCombos,
   getComboById,
   updateCombo,
   deleteCombo,
+  getComboDetailsBySlug,
 };

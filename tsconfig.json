@@ -5,7 +5,7 @@
     "outDir": "./dist",
     "baseUrl": "./src",
     "paths": {
-       "@/*": ["*"],   
+      "@/*": ["*"],
       "@app/*": ["app/*"],
       "@config/*": ["config/*"],
       "@middlewares/*": ["middlewares/*"],
@@ -23,6 +23,9 @@
     "noUncheckedIndexedAccess": true,
     "exactOptionalPropertyTypes": true,
 
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+
     // Style Options
     "noImplicitReturns": true,
     "noImplicitOverride": true,
@@ -33,7 +36,6 @@
 
     // Recommended Options
     "strict": true,
-    "verbatimModuleSyntax": true,
     "isolatedModules": true,
     "noUncheckedSideEffectImports": true,
     "moduleDetection": "force",

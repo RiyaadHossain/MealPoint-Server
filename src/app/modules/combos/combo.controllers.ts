@@ -8,7 +8,6 @@ import { comboFilterableFields } from "./combo.constants.js";
 import { paginationFields } from "@/constants/pagination.js";
 
 const createCombo = catchAsync(async (req: Request, res: Response) => {
-   
   const combo = await ComboService.createCombo(req.body);
   sendResponse(res, {
     statusCode: httpStatus.CREATED,
@@ -18,11 +17,13 @@ const createCombo = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
- const getCombos = catchAsync(async (req: Request, res: Response) => {
-
+const getCombos = catchAsync(async (req: Request, res: Response) => {
   const filtersOptions = pick(req.query, comboFilterableFields);
   const paginationOptions = pick(req.query, paginationFields);
-  const response = await ComboService.getCombos(paginationOptions, filtersOptions);
+  const response = await ComboService.getCombos(
+    paginationOptions,
+    filtersOptions
+  );
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -33,19 +34,19 @@ const createCombo = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
- const getComboById = catchAsync(async (req: Request, res: Response) => {
-  const comboId = req.params?.['id'] as string
+const getComboById = catchAsync(async (req: Request, res: Response) => {
+  const comboId = req.params?.["id"] as string;
   const data = await ComboService.getComboById(comboId);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
     message: "Combos retrieved successfully",
-    data
+    data,
   });
 });
 
- const updateCombo = catchAsync(async (req: Request, res: Response) => {
+const updateCombo = catchAsync(async (req: Request, res: Response) => {
   const id = req.params["id"] as string;
   const combo = await ComboService.updateCombo(id, req.body);
   sendResponse(res, {
@@ -56,7 +57,7 @@ const createCombo = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
- const deleteCombo = catchAsync(async (req: Request, res: Response) => {
+const deleteCombo = catchAsync(async (req: Request, res: Response) => {
   const id = req.params["id"] as string;
   await ComboService.deleteCombo(id);
   sendResponse(res, {
@@ -67,10 +68,24 @@ const createCombo = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const getComboDetailsBySlug = catchAsync(
+  async (req: Request, res: Response) => {
+    const slug = req.params["slug"] as string;
+    const combo = await ComboService.getComboDetailsBySlug(slug);
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "Combo details retrieved successfully",
+      data: combo,
+    });
+  }
+);
+
 export const ComboController = {
   createCombo,
   getComboById,
   getCombos,
   updateCombo,
   deleteCombo,
-}
+  getComboDetailsBySlug,
+};

@@ -1,4 +1,6 @@
 import { Category } from "./category.model.js";
+import ApiError from "@/errors/ApiError.js";
+import httpStatus from "http-status";
 import type { ICategory } from "./category.interface.js";
 
 const getCategories = async () => {
@@ -43,9 +45,16 @@ const deleteCategory = async (categoryId: string) => {
   return null;
 };
 
+const getCategoryDetailsBySlug = async (slug: string) => {
+  const category = await Category.findOne({ slug });
+  if (!category) throw new ApiError(httpStatus.NOT_FOUND, "Category not found");
+  return category;
+};
+
 export const CategoryService = {
   getCategories,
   createCategory,
   updateCategory,
   deleteCategory,
+  getCategoryDetailsBySlug,
 };

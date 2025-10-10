@@ -9,6 +9,7 @@ export interface IComboItem {
 export interface ICombo {
   id: string;
   name: string;
+  slug: string;
   description: string;
   price: number;
   totalSold: number;

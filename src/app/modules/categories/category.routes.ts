@@ -28,4 +28,7 @@ router.patch(
 
 router.delete("/:id", auth(UserRole.ADMIN), CategoryController.deleteCategory);
 
+// Get category details by slug
+router.get("/slug/:slug", CategoryController.getCategoryDetailsBySlug);
+
 export const categoryRoutes = router;

@@ -12,6 +12,9 @@ router.get("/", MenuController.getMenus);
 // Get menu details by ID
 router.get("/:id", MenuController.getMenuDetails);
 
+// Get menu details by Slug
+router.get("/slug/:slug", MenuController.getMenuDetailsBySlug);
+
 // Only admin can access these routes
 router.post(
   "/",

@@ -11,6 +11,7 @@ export interface IMenu {
   available: boolean;
   totalSold: number;
   label: MenuLabel;
+  slug: string;
   estimatedTime: number;
 }
 

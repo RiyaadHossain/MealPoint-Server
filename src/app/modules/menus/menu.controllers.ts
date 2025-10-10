@@ -71,10 +71,22 @@ const getMenuDetails = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const getMenuDetailsBySlug = catchAsync(async (req: Request, res: Response) => {
+  const slug = req.params["slug"] as string;
+  const menu = await MenuService.getMenuDetailsBySlug(slug);
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "Menu details retrieved successfully",
+    data: menu,
+  });
+});
+
 export const MenuController = {
   getMenus,
   createMenu,
   updateMenu,
   deleteMenu,
   getMenuDetails,
+  getMenuDetailsBySlug,
 };
