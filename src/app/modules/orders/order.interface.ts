@@ -1,4 +1,5 @@
 // Order interfaces and types
+import { MenuSize } from "@/enums/menu.enum.js";
 import type {
   OrderItemType,
   OrderStatus,
@@ -12,6 +13,7 @@ export interface IOrderItem {
   comboItemId: Types.ObjectId;
   quantity: number;
   price: number;
+  size?: MenuSize;
   type: OrderItemType;
 }
 

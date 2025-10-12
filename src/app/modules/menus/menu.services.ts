@@ -98,9 +98,8 @@ const createMenu = async (menuData: IMenu) => {
 const updateMenu = async (menuId: string, updateData: Partial<IMenu>) => {
   // check if the menu exists
   const existingMenu = await Menu.findOne({ id: menuId });
-  if (!existingMenu) {
+  if (!existingMenu) 
     throw new Error("Menu not found");
-  }
 
   // Update menu
   const menu = await Menu.findOneAndUpdate({ id: menuId }, updateData, {

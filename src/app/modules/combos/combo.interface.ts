@@ -1,9 +1,11 @@
+import { MenuSize } from "@/enums/menu.enum.js";
 import { Types } from "mongoose";
 
 export interface IComboItem {
   item: Types.ObjectId; // Reference to menu item
   quantity: number;
   price: number;
+  size: MenuSize
 }
 
 export interface ICombo {

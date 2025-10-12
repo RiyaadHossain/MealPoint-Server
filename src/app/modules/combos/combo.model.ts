@@ -1,11 +1,13 @@
 import { Schema, model } from "mongoose";
 import type { ICombo } from "./combo.interface.js";
 import { slugify } from "@/utils/slugify.js";
+import { MenuSize } from "@/enums/menu.enum.js";
 
 const ComboItemSchema = new Schema({
   item: { type: Schema.Types.ObjectId, ref: "Menu", required: true },
   quantity: { type: Number, required: true, default: 1 },
   price: { type: Number, required: true, min: 0 },
+  size: { type: String, enum: MenuSize, required: true },
 });
 
 const ComboSchema = new Schema<ICombo>(

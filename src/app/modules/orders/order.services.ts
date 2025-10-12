@@ -161,7 +161,6 @@ const createOrder = async (
   orderData.id = await generateOrderId();
   orderData.totalPrice = totalPrice;
   orderData.user = userExists._id;
-  console.log({orderData})
 
   const order = await Order.create(orderData);
   if (!order)

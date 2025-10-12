@@ -1,8 +1,10 @@
+import { MenuSize } from "@/enums/menu.enum.js";
 import { z } from "zod";
 
 export const comboItemSchema = z.object({
   item: z.string().min(1, "Menu item reference required"),
   quantity: z.number().int().min(1, "Quantity must be at least 1"),
+  size: z.enum(Object.values(MenuSize)),
   // price: z.number().min(0, "Price must be >= 0"),
 });
 

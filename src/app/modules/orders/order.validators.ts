@@ -1,11 +1,14 @@
 // Order validation schemas using Zod
 import { z } from "zod";
 import { OrderItemType, OrderStatus, OrderType } from "@/enums/order.enum.js";
+import { MenuSize } from "@/enums/menu.enum.js";
 
 const orderItemSchema = z.object({
   menuItemId: z.string().min(1).optional(),
   comboItemId: z.string().min(1).optional(),
   quantity: z.number().min(1),
+  price: z.number().min(0),
+  size: z.enum(Object.values(MenuSize)).optional(),
   type: z.enum(Object.values(OrderItemType)),
 });
 

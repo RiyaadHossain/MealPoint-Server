@@ -2,6 +2,7 @@
 import mongoose, { Schema } from "mongoose";
 import type { IOrder, IOrderItem } from "./order.interface.js";
 import { OrderItemType, OrderStatus, OrderType } from "@/enums/order.enum.js";
+import { MenuSize } from "@/enums/menu.enum.js";
 
 const OrderItemSchema = new Schema<IOrderItem>({
   orderId: { type: Schema.Types.ObjectId, ref: "Order", required: true },
@@ -9,6 +10,7 @@ const OrderItemSchema = new Schema<IOrderItem>({
   comboItemId: { type: Schema.Types.ObjectId, ref: "Combo" },
   quantity: { type: Number, required: true },
   price: { type: Number, required: true },
+  size: { type: String, enum: MenuSize },
   type: {
     type: String,
     enum: Object.values(OrderItemType),

@@ -6,3 +6,9 @@ export enum MenuLabel {
   BEST_SELLER = "best-seller",
   LIMITED_EDITION = "limited-edition",
 }
+
+export enum MenuSize {
+  SMALL = "small",
+  MEDIUM = "medium",
+  LARGE = "large",
+}

@@ -1,18 +1,18 @@
-import { Combo } from "./combo.model.js";
-import type { ICombo } from "./combo.interface.js";
+import mongoose from "mongoose";
 import httpStatus from "http-status";
+import type { SortOrder } from "mongoose";
+import { Combo } from "./combo.model.js";
 import ApiError from "@/errors/ApiError.js";
+import { Menu } from "../menus/menu.model.js";
+import type { ICombo } from "./combo.interface.js";
 import { generateComboId } from "@/utils/menu-id.js";
 import type { IPaginationType } from "@/interfaces/paginaiton.js";
 import type { IMenuFilterOptoins } from "../menus/menu.interface.js";
 import { paginationHelpers } from "@/helper/paginationHelper.js";
-import type { SortOrder } from "mongoose";
 import { comboSearchableFields } from "./combo.constants.js";
 import { actualFilterField } from "@/utils/format-text.js";
 import { rangeEnd, rangeStart } from "@/constants/range.query.js";
 import { isMongoObjectId } from "@/utils/mongodb.js";
-import mongoose from "mongoose";
-import { Menu } from "../menus/menu.model.js";
 import { NotificationService } from "../notifications/notification.services.js";
 import { NotificationType } from "@/enums/notification-type.enum.js";
 import { NotificationEvents } from "../notifications/notification.constants.js";
@@ -30,7 +30,7 @@ const createCombo = async (payload: Omit<ICombo, "id">) => {
         `Menu item not found: ${comboItem.item}`
       );
 
-    comboItem.price = menuExists.price * comboItem.quantity;
+    comboItem.price = menuExists.price[comboItem.size] * comboItem.quantity;
   }
 
   await NotificationService.createNotificationForEvent(
