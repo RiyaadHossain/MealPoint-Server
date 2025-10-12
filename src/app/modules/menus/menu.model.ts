@@ -2,17 +2,29 @@ import { Schema, model } from "mongoose";
 import type { IMenu } from "./menu.interface.js";
 import { MenuLabel, MenuSize } from "@/enums/menu.enum.js";
 import { slugify } from "@/utils/slugify.js";
+import ApiError from "@/errors/ApiError.js";
+import httpStatus from "http-status";
 
-const priceSchemaDef: Record<string, any> = {};
-for (const size of Object.values(MenuSize))
-  priceSchemaDef[size] = { type: Number, required: true };
+const variationSchema = new Schema(
+  {
+    size: {
+      type: String,
+      enum: Object.values(MenuSize),
+      required: true,
+    },
+    price: { type: Number, required: true },
+  },
+  { _id: false }
+);
 
 const MenuSchema = new Schema<IMenu>(
   {
     id: { type: String, required: true, unique: true },
     name: { type: String, required: true, unique: true },
     description: { type: String, required: true },
-    price: priceSchemaDef,
+    basePrice: { type: Number }, // used when hasVariants = false
+    variations: { type: [variationSchema], default: [] },
+    hasVariants: { type: Boolean, default: false },
     category: { type: Schema.Types.ObjectId, ref: "Category", required: true },
     image: { type: String, required: true },
     available: { type: Boolean, default: true },
@@ -29,8 +41,27 @@ const MenuSchema = new Schema<IMenu>(
   { timestamps: true }
 );
 
-// ✅ Generate slug before saving
 MenuSchema.pre("validate", function (next) {
+  // ✅ Validation to prevent both basePrice and variations
+  const hasBase = !!this.basePrice;
+  const hasVar = (this.variations?.length ?? 0) > 0;
+  if (hasBase && hasVar)
+    return next(
+      new ApiError(
+        httpStatus.BAD_REQUEST,
+        "Menu item cannot have both basePrice and variations"
+      )
+    );
+
+  if (!hasBase && !hasVar)
+    return next(
+      new ApiError(
+        httpStatus.BAD_REQUEST,
+        "Menu item must have either basePrice or variations"
+      )
+    );
+
+  // ✅ Generate slug before saving
   if (this.isModified("name") || !this.slug) this.slug = slugify(this.name);
   next();
 });

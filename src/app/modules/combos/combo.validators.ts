@@ -12,7 +12,7 @@ export const createComboSchema = z.object({
   body: z.object({
     name: z.string().min(5, "Name must be at least 5 characters"),
     description: z.string().optional(),
-    price: z.number().min(0),
+    basePrice: z.number().min(0),
     image: z.string().url().optional(),
     items: z.array(comboItemSchema).min(1),
     estimatedTime: z.string().optional(),

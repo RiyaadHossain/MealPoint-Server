@@ -30,7 +30,10 @@ const createCombo = async (payload: Omit<ICombo, "id">) => {
         `Menu item not found: ${comboItem.item}`
       );
 
-    comboItem.price = menuExists.price[comboItem.size] * comboItem.quantity;
+    if (comboItem.hasVariants && menuExists.variations) {
+      const variant = menuExists.variations.find((v) => v.size === comboItem.size);
+      comboItem.price = (variant?.price ?? 1) * comboItem.quantity;
+    } else comboItem.price = (menuExists.basePrice ?? 1) * comboItem.quantity;
   }
 
   await NotificationService.createNotificationForEvent(

@@ -122,7 +122,7 @@ const deleteDiscount = async (id: string) => {
 
 const applyDiscount = async (
   orderId: Types.ObjectId,
-  discountId: string[],
+  discountId: string,
   userId: string
 ) => {
   const user = await User.findOne({ id: userId });

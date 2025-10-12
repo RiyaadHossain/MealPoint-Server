@@ -1,10 +1,14 @@
 // Order service functions
 import { Order, OrderItem } from "./order.model.js";
-import type { IOrder, IOrderFilterOptions } from "./order.interface.js";
+import type {
+  IOrder,
+  IOrderFilterOptions,
+  IOrderPayload,
+} from "./order.interface.js";
 import { generateOrderId } from "@/utils/order-id.js";
 import type { IPaginationType } from "@/interfaces/paginaiton.js";
 import { paginationHelpers } from "@/helper/paginationHelper.js";
-import {  orderSearchableFields } from "./order.constants.js";
+import { orderSearchableFields } from "./order.constants.js";
 import { rangeEnd, rangeStart } from "@/constants/range.query.js";
 import { actualFilterField } from "@/utils/format-text.js";
 import { isMongoObjectId } from "@/utils/mongodb.js";
@@ -126,18 +130,16 @@ const getOrdersByCustomerId = async (customerId: string) => {
 /**
  * Create a new order
  */
-const createOrder = async (
-  userId: string,
-  orderData: IOrder & { discountId: string[] }
-) => {
+const createOrder = async (userId: string, orderData: IOrderPayload) => {
   // check if user exists
   const userExists = await User.exists({ id: userId });
   if (!userExists) throw new Error("User not found");
 
   let totalPrice = 0;
-  // check if order items exist
   await Promise.all(
     orderData.items.map(async (item) => {
+
+      // check if menu item or combo exists
       let itemExists = null;
       if (item.type === OrderItemType.MENU)
         itemExists = await Menu.findById(item.menuItemId);
@@ -149,11 +151,25 @@ const createOrder = async (
           `Menu item ${item.menuItemId || item.comboItemId} not found`
         );
 
-      itemExists.totalSold += item.quantity; // increment total sold
-      await itemExists.save(); // save updated total sold
+      // Update total sold for menu or combo item
+      itemExists.totalSold += item.quantity;
+      await itemExists.save(); 
 
-      // @ts-ignore
-      item.price = itemExists.price * item.quantity; // set price from menu item
+      // Calculate price
+      if (item.type === OrderItemType.MENU && item.hasVariations) {
+        // @ts-ignore
+        const variant = itemExists.variations?.find((v: any) => v.size === item.size);
+        
+        if (!variant)
+          throw new Error(
+            `Variant ${item.size} not found for menu item ${item.menuItemId}`
+          );
+        
+        item.price = variant.price * item.quantity; // set price from variant
+
+        // @ts-ignore
+      } else item.price = itemExists.basePrice * item.quantity; // set price from menu item
+
       totalPrice += item.price;
     })
   );

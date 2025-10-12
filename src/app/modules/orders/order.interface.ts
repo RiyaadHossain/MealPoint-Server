@@ -15,6 +15,7 @@ export interface IOrderItem {
   price: number;
   size?: MenuSize;
   type: OrderItemType;
+  hasVariations?: boolean;
 }
 
 export interface IOrder {
@@ -38,3 +39,11 @@ export interface IOrderFilterOptions {
   type?: OrderType;
   userId?: string;
 }
+
+export type IOrderPayload = IOrder & {
+  items: (IOrderItem & { hasVariations: boolean })[];
+  type: OrderType;
+  deliveryAddress?: string;
+  notes?: string;
+  discountId?: string;
+};

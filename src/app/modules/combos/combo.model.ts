@@ -5,6 +5,7 @@ import { MenuSize } from "@/enums/menu.enum.js";
 
 const ComboItemSchema = new Schema({
   item: { type: Schema.Types.ObjectId, ref: "Menu", required: true },
+  hasVariants: { type: Boolean, default: false },
   quantity: { type: Number, required: true, default: 1 },
   price: { type: Number, required: true, min: 0 },
   size: { type: String, enum: MenuSize, required: true },
@@ -15,7 +16,7 @@ const ComboSchema = new Schema<ICombo>(
     id: { type: String, required: true, unique: true },
     name: { type: String, required: true },
     description: { type: String },
-    price: { type: Number, required: true, min: 0 },
+    basePrice: { type: Number, required: true, min: 0 },
     image: { type: String },
     totalSold: { type: Number, default: 0 },
     items: { type: [ComboItemSchema], required: true },

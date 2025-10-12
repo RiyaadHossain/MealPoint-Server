@@ -1,14 +1,19 @@
 import type { MenuLabel, MenuSize } from "@/enums/menu.enum.js";
 import { Types } from "mongoose";
 
-type IPrice = { [key in MenuSize]: number };
+export interface IPriceVariation {
+  size: MenuSize;
+  price: number;
+}
 
 export interface IMenu {
   id: string;
   name: string;
   slug: string;
   description: string;
-  price: IPrice;
+  basePrice?: number; // for single-size items
+  variations?: IPriceVariation[]; // for items with multiple sizes
+  hasVariants: boolean; // easily distinguish in logic
   category: Types.ObjectId;
   // size: MenuSize; // Removed as price now supports multiple sizes
   tags: string[];

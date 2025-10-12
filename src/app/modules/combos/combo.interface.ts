@@ -3,6 +3,7 @@ import { Types } from "mongoose";
 
 export interface IComboItem {
   item: Types.ObjectId; // Reference to menu item
+  hasVariants: boolean;
   quantity: number;
   price: number;
   size: MenuSize
@@ -13,7 +14,7 @@ export interface ICombo {
   name: string;
   slug: string;
   description: string;
-  price: number;
+  basePrice: number;
   totalSold: number;
   image: string;
   items: IComboItem[];
