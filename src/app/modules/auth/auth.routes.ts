@@ -9,6 +9,7 @@ import {
 import { AuthController } from "./auth.controllers.js";
 import auth from "@/app/middlewares/auth.js";
 import { UserRole } from "@/enums/user.enum.js";
+import { loginRateLimiter } from "@/config/rate-limit.js";
 const router = Router();
 
 // POST /auth/register
@@ -18,7 +19,7 @@ router.post(
   AuthController.register
 );
 
-router.post("/login", validateRequest(loginSchema), AuthController.login);
+router.post("/login", loginRateLimiter,validateRequest(loginSchema), AuthController.login); 
 router.post("/social-login", validateRequest(socialLoginSchema), AuthController.socialLogin);
 
 router.get(
