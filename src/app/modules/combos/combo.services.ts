@@ -31,7 +31,9 @@ const createCombo = async (payload: Omit<ICombo, "id">) => {
       );
 
     if (comboItem.hasVariants && menuExists.variations) {
-      const variant = menuExists.variations.find((v) => v.size === comboItem.size);
+      const variant = menuExists.variations.find(
+        (v) => v.size === comboItem.size
+      );
       comboItem.price = (variant?.price ?? 1) * comboItem.quantity;
     } else comboItem.price = (menuExists.basePrice ?? 1) * comboItem.quantity;
   }
@@ -43,7 +45,8 @@ const createCombo = async (payload: Omit<ICombo, "id">) => {
   );
 
   // Create combo
-  return Combo.create({ ...payload, id });
+  const combo = await Combo.create({ ...payload, id });
+  return combo;
 };
 
 const getCombos = async (
@@ -130,19 +133,26 @@ const getComboById = async (id: string) => {
 
 const updateCombo = async (id: string, payload: Partial<ICombo>) => {
   // Check combo exists
-  const comboExists = await Combo.exists({ id });
+  const comboExists = await Combo.find({ id });
   if (!comboExists) throw new ApiError(httpStatus.NOT_FOUND, "Combo not found");
 
   // If updating items, validate menu items
   if (payload.items) {
     for (const comboItem of payload.items) {
-      const menuExists = await Menu.exists({ _id: comboItem.item });
-      if (!menuExists) {
+      const menuExists = await Menu.findById(comboItem.item);
+      if (!menuExists)
         throw new ApiError(
           httpStatus.BAD_REQUEST,
           `Menu item not found: ${comboItem.item}`
         );
-      }
+
+      if (comboItem.hasVariants && menuExists?.variations) {
+        const variant = menuExists.variations.find(
+          (v: any) => v.size === comboItem.size
+        );
+        comboItem.price = (variant?.price ?? 1) * comboItem.quantity;
+      } else
+        comboItem.price = (menuExists?.basePrice ?? 1) * comboItem.quantity;
     }
   }
 

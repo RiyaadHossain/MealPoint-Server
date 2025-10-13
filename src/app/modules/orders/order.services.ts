@@ -194,7 +194,8 @@ const createOrder = async (userId: string, orderData: IOrderPayload) => {
   }
 
   order.netPrice = totalPrice - discountAmount;
-  order.netPrice += await getTaxAmount(order.netPrice);
+  order.tax = await getTaxAmount(order.netPrice);
+  order.netPrice += order.tax;
 
   // create order items
   await Promise.all(
@@ -217,6 +218,7 @@ const createOrder = async (userId: string, orderData: IOrderPayload) => {
     })
   );
 
+  await order.save()
   return order;
 };
 

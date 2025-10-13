@@ -6,7 +6,7 @@ export interface IComboItem {
   hasVariants: boolean;
   quantity: number;
   price: number;
-  size: MenuSize
+  size?: MenuSize
 }
 
 export interface ICombo {

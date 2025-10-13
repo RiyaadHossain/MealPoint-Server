@@ -113,12 +113,12 @@ const updatePaymentStatus = async (
     PaymentStatus.FAILED,
     PaymentStatus.CANCELLED,
   ];
-  if (finalStatus.includes(payment.status)) {
+  if (finalStatus.includes(payment.status))
     throw new ApiError(
       httpStatus.BAD_REQUEST,
       "Payment status cannot be changed once finalized"
     );
-  }
+  
 
   // 3. Update payment status
   payment.status =

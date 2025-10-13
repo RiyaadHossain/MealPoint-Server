@@ -98,8 +98,7 @@ const createMenu = async (menuData: IMenu) => {
 const updateMenu = async (menuId: string, updateData: Partial<IMenu>) => {
   // check if the menu exists
   const existingMenu = await Menu.findOne({ id: menuId });
-  if (!existingMenu) 
-    throw new Error("Menu not found");
+  if (!existingMenu) throw new Error("Menu not found");
 
   // Update menu
   const menu = await Menu.findOneAndUpdate({ id: menuId }, updateData, {
@@ -109,14 +108,13 @@ const updateMenu = async (menuId: string, updateData: Partial<IMenu>) => {
   return menu;
 };
 
-const deleteMenu = async (menuId: string) => {
+const deleteMenu = async (id: string) => {
   // check if the menu exists
-  const existingMenu = await Menu.findOne({ id: menuId });
-  if (!existingMenu) {
+  const existingMenu = await Menu.findOne({ id });
+  if (!existingMenu) 
     throw new Error("Menu not found");
-  }
 
-  await Menu.findOneAndDelete({ id: menuId });
+  await Menu.findOneAndDelete({ id });
   return null;
 };
 
@@ -131,7 +129,7 @@ const getMenuDetailsBySlug = async (slug: string) => {
   const menu = await Menu.findOne({ slug }).populate("category");
   if (!menu) throw new ApiError(httpStatus.NOT_FOUND, "Menu not found");
   return menu;
-}
+};
 
 export const MenuService = {
   getMenus,

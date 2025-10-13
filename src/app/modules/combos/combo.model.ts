@@ -8,7 +8,7 @@ const ComboItemSchema = new Schema({
   hasVariants: { type: Boolean, default: false },
   quantity: { type: Number, required: true, default: 1 },
   price: { type: Number, required: true, min: 0 },
-  size: { type: String, enum: MenuSize, required: true },
+  size: { type: String, enum: MenuSize },
 });
 
 const ComboSchema = new Schema<ICombo>(

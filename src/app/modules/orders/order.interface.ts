@@ -9,13 +9,13 @@ import type { Types } from "mongoose";
 
 export interface IOrderItem {
   orderId: Types.ObjectId;
-  menuItemId: Types.ObjectId;
-  comboItemId: Types.ObjectId;
+  menuItemId?: Types.ObjectId;
+  comboItemId?: Types.ObjectId;
   quantity: number;
   price: number;
   size?: MenuSize;
   type: OrderItemType;
-  hasVariations?: boolean;
+  hasVariations?: boolean; // Not stored in DB, used for avoid typescript errors
 }
 
 export interface IOrder {
@@ -25,6 +25,7 @@ export interface IOrder {
   discount?: Types.ObjectId;
   totalPrice: number;
   netPrice: number;
+  tax: number;
   type: OrderType;
   deliveryAddress?: string;
   payment?: Types.ObjectId;

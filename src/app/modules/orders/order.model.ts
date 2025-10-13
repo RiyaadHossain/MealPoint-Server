@@ -28,6 +28,7 @@ const OrderSchema = new Schema<IOrder>({
   discount: { type: Schema.Types.ObjectId, ref: "Discount" },
   totalPrice: { type: Number, required: true },
   netPrice: { type: Number },
+  tax: { type: Number, required: true, default: 0 },
   type: { type: String, enum: Object.values(OrderType), required: true },
   deliveryAddress: { type: String },
   payment: { type: Schema.Types.ObjectId, ref: "Payment" },

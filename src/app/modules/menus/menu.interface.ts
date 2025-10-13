@@ -13,9 +13,8 @@ export interface IMenu {
   description: string;
   basePrice?: number; // for single-size items
   variations?: IPriceVariation[]; // for items with multiple sizes
-  hasVariants: boolean; // easily distinguish in logic
+  hasVariants: boolean; 
   category: Types.ObjectId;
-  // size: MenuSize; // Removed as price now supports multiple sizes
   tags: string[];
   image: string;
   available: boolean;
