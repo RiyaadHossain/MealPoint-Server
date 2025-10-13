@@ -3,7 +3,7 @@ import { z } from "zod";
 export const createMenuSchema = z.object({
   body: z.object({
     name: z.string().min(1).max(100),
-    description: z.string().min(1).max(500),
+    description: z.string().min(1).max(2500),
     basePrice: z.number().min(0).optional(),
     hasVariants: z.boolean(),
     variations: z

@@ -46,7 +46,7 @@ export function calcDiscount(
   percentage: number
 ) {
   if (percentage <= 0) return 0;
-  const discount = (totalAmount * percentage) / 100;
+  const discount = Math.round((totalAmount * percentage) / 100);
   // Ensure discount is not negative and does not exceed totalAmount
   return Math.max(0, Math.min(discount, totalAmount));
 }

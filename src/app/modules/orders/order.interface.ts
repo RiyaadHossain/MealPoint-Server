@@ -22,10 +22,10 @@ export interface IOrder {
   id: string;
   user: Types.ObjectId;
   status: OrderStatus;
-  discount?: Types.ObjectId;
+  discountUsage?: Types.ObjectId;
   totalPrice: number;
-  netPrice: number;
   tax: number;
+  netPrice: number;
   type: OrderType;
   deliveryAddress?: string;
   payment?: Types.ObjectId;

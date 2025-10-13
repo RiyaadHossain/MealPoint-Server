@@ -25,6 +25,8 @@ import { DiscountService } from "../discounts/discount.services.js";
 import ApiError from "@/errors/ApiError.js";
 import httpStatus from "http-status";
 import { getTaxAmount } from "./order.utils.js";
+import { IMenu } from "../menus/menu.interface.js";
+import { ICombo } from "../combos/combo.interface.js";
 
 /**
  * Get paginated and filtered orders
@@ -140,7 +142,7 @@ const createOrder = async (userId: string, orderData: IOrderPayload) => {
     orderData.items.map(async (item) => {
 
       // check if menu item or combo exists
-      let itemExists = null;
+      let itemExists: IMenu | ICombo | any = null;
       if (item.type === OrderItemType.MENU)
         itemExists = await Menu.findById(item.menuItemId);
       if (item.type === OrderItemType.COMBO)
@@ -156,7 +158,7 @@ const createOrder = async (userId: string, orderData: IOrderPayload) => {
       await itemExists.save(); 
 
       // Calculate price
-      if (item.type === OrderItemType.MENU && item.hasVariations) {
+      if (item.type === OrderItemType.MENU && itemExists.hasVariants) {
         // @ts-ignore
         const variant = itemExists.variations?.find((v: any) => v.size === item.size);
         
@@ -190,7 +192,7 @@ const createOrder = async (userId: string, orderData: IOrderPayload) => {
       userId
     );
     discountAmount = discount.discountAmount;
-    order.discount = discount._id;
+    order.discountUsage = discount._id;
   }
 
   order.netPrice = totalPrice - discountAmount;
@@ -219,6 +221,11 @@ const createOrder = async (userId: string, orderData: IOrderPayload) => {
   );
 
   await order.save()
+  await order.populate({
+    path: "discountUsage",
+    populate: { path: "discountId" }
+  });
+
   return order;
 };
 

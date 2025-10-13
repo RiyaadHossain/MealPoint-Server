@@ -21,6 +21,8 @@ const createCombo = async (payload: Omit<ICombo, "id">) => {
   // Generate combo id
   const id = await generateComboId();
 
+  payload.estimatedTime = 0; // Reset estimated time
+
   // Validate all menu items exist
   for (const comboItem of payload.items) {
     const menuExists = await Menu.findById(comboItem.item);
@@ -36,6 +38,8 @@ const createCombo = async (payload: Omit<ICombo, "id">) => {
       );
       comboItem.price = (variant?.price ?? 1) * comboItem.quantity;
     } else comboItem.price = (menuExists.basePrice ?? 1) * comboItem.quantity;
+
+    payload.estimatedTime += menuExists.estimatedTime;
   }
 
   await NotificationService.createNotificationForEvent(
@@ -43,6 +47,12 @@ const createCombo = async (payload: Omit<ICombo, "id">) => {
     NotificationType.ALL_USER,
     NotificationEvents.NEW_ITEMS
   );
+
+  payload.basePrice = payload.items.reduce(
+    (total, item) => total + item.price,
+    0
+  );
+
 
   // Create combo
   const combo = await Combo.create({ ...payload, id });

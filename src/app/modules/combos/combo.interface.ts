@@ -19,5 +19,5 @@ export interface ICombo {
   image: string;
   items: IComboItem[];
   isAvailable: boolean;
-  estimatedTime: string;
+  estimatedTime: number;
 }
