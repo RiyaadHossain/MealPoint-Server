@@ -143,7 +143,7 @@ const getComboById = async (id: string) => {
 
 const updateCombo = async (id: string, payload: Partial<ICombo>) => {
   // Check combo exists
-  const comboExists = await Combo.find({ id });
+  const comboExists = await Combo.findOne({ id });
   if (!comboExists) throw new ApiError(httpStatus.NOT_FOUND, "Combo not found");
 
   // If updating items, validate menu items

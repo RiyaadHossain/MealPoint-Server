@@ -4,7 +4,8 @@ import httpStatus from "http-status";
 import type { ICategory } from "./category.interface.js";
 
 const getCategories = async () => {
-  return Category.find();
+  const categories = await Category.find().lean();
+  return categories;
 };
 
 const createCategory = async (categoryData: ICategory) => {

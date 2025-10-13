@@ -245,7 +245,7 @@ const updateOrder = async (orderId: string, updateData: Partial<IOrder>) => {
  * Approve or reject an order (admin only)
  */
 const approveOrder = async (orderId: string, status: OrderStatus) => {
-  const order = await Order.findById(orderId);
+  const order = await Order.findOne({ id: orderId });
   if (!order) throw new Error("Order not found");
   order.status = status;
   await order.save();

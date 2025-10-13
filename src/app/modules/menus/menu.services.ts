@@ -119,7 +119,7 @@ const deleteMenu = async (id: string) => {
 };
 
 const getMenuDetails = async (id: string) => {
-  const menu = await Menu.findById(id).populate("category");
+  const menu = await Menu.findOne({ id }).populate("category");
   if (!menu) throw new ApiError(httpStatus.NOT_FOUND, "Menu not found");
 
   return menu;
