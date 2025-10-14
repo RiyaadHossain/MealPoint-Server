@@ -48,3 +48,6 @@ pids
 # TypeScript cache
 *.tsbuildinfo
 .vercel
+
+# Ignore this file
+to-do.txt

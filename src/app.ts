@@ -7,6 +7,8 @@ import { notFoundHandler } from "app/middlewares/not-found.js";
 import { corsOptions } from "./config/cors.js";
 import { globalRateLimiter, speedLimiter } from "./config/rate-limit.js";
 import { mongoSanitize } from "./app/middlewares/mongo-sanitize.js";
+import config from "./config/index.js";
+import { ENV } from "./enums/env.js";
 
 const app = express();
 
@@ -15,9 +17,12 @@ app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(helmet()); // Security headers
-app.use(globalRateLimiter); // Rate limiting
-app.use(speedLimiter); // Optional slowdown
 app.use(mongoSanitize); // Prevent NoSQL injection
+
+if (config.NODE_ENV === ENV.PRODUCTION) {
+  app.use(globalRateLimiter); // Rate limiting
+  app.use(speedLimiter); // Optional slowdown
+}
 
 // Routes
 app.use("/api/v1/", router);

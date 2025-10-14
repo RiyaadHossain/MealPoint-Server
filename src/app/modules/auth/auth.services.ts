@@ -14,7 +14,7 @@ import httpStatus from "http-status";
 import { UserRole } from "@/enums/user.enum.js";
 
 const register = async (userData: IUser) => {
-  const role = UserRole.CUSTOMER
+  const role = UserRole.CUSTOMER;
   const { email } = userData;
 
   const existingUser = await User.findOne({ email });
