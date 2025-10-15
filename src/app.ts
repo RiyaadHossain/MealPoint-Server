@@ -5,10 +5,10 @@ import { errorHandler } from "app/middlewares/error-middleware.js";
 import router from "app/routes/index.js";
 import { notFoundHandler } from "app/middlewares/not-found.js";
 import { corsOptions } from "./config/cors.js";
-import { globalRateLimiter, speedLimiter } from "./config/rate-limit.js";
+// import { globalRateLimiter, speedLimiter } from "./config/rate-limit.js";
 import { mongoSanitize } from "./app/middlewares/mongo-sanitize.js";
-import config from "./config/index.js";
-import { ENV } from "./enums/env.js";
+// import config from "./config/index.js";
+// import { ENV } from "./enums/env.js";
 
 const app = express();
 
