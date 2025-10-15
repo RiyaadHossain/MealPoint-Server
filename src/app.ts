@@ -19,10 +19,10 @@ app.use(express.urlencoded({ extended: true }));
 app.use(helmet()); // Security headers
 app.use(mongoSanitize); // Prevent NoSQL injection
 
-if (config.NODE_ENV === ENV.PRODUCTION) {
-  app.use(globalRateLimiter); // Rate limiting
-  app.use(speedLimiter); // Optional slowdown
-}
+// if (config.NODE_ENV === ENV.PRODUCTION) {
+//   app.use(globalRateLimiter); // Rate limiting
+//   app.use(speedLimiter); // Optional slowdown
+// }
 
 // Routes
 app.use("/api/v1/", router);
