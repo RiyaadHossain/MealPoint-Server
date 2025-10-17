@@ -3,7 +3,8 @@ import { z } from "zod";
 
 export const createReviewZodSchema = z.object({
   body: z.object({
-    orderId: z.string().nonempty("Order ID is required"),
+    mealId: z.string().optional(),
+    comboId: z.string().optional(),
     rating: z
       .number()
       .min(1, "Rating must be at least 1")

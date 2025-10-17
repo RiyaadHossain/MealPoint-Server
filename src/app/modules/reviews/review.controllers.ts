@@ -16,6 +16,17 @@ const getAllReviews = async (_req: Request, res: Response) => {
   });
 };
 
+const getReviewsByProduct = async (req: Request, res: Response) => {
+  const productId = req.params["productId"] as string;
+  const reviews = await ReviewService.getReviewsByProduct(productId);
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "Product reviews fetched successfully",
+    data: reviews,
+  });
+};
+
 /**
  * Get best reviews
  */
@@ -33,8 +44,8 @@ const getBestReviews = async (_req: Request, res: Response) => {
  * Create a review
  */
 const createReview = async (req: Request, res: Response) => {
-    const userId = req.user?.['id']; 
-  const review = await ReviewService.createReview(userId,req.body);
+  const userId = req.user?.["id"];
+  const review = await ReviewService.createReview(userId, req.body);
   sendResponse(res, {
     statusCode: 201,
     success: true,
@@ -43,8 +54,23 @@ const createReview = async (req: Request, res: Response) => {
   });
 };
 
+const deleteReview = async (req: Request, res: Response) => {
+  const reviewId = req.params["id"] as string;
+  const userId = req.user?.["id"] as string;
+
+  await ReviewService.deleteReview(reviewId, userId);
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "Review deleted successfully",
+  });
+};
+
 export const ReviewController = {
   getAllReviews,
+  getReviewsByProduct,
   getBestReviews,
   createReview,
+  deleteReview,
 };

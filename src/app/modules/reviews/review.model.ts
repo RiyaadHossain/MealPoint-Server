@@ -3,7 +3,8 @@ import { Schema, model } from "mongoose";
 import type { IReview } from "./review.interface.js";
 
 const reviewSchema = new Schema<IReview>({
-  orderId: { type: String, required: true, ref: "Order" },
+  menuId: { type: String, ref: "Menu" },
+  comboId: { type: String, ref: "Combo" },
   userId: { type: String, required: true, ref: "User" },
   rating: { type: Number, required: true, min: 1, max: 5 },
   comment: { type: String },

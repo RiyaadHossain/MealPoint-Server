@@ -9,10 +9,12 @@ import { UserRole } from "@/enums/user.enum.js";
 const router = express.Router();
 
 // Get all reviews
-router.get("/", auth(UserRole.CUSTOMER, UserRole.ADMIN), ReviewController.getAllReviews);
+router.get("/", ReviewController.getAllReviews);
+
+router.get("/product/:productId", ReviewController.getReviewsByProduct);
 
 // Get best reviews
-router.get("/best", auth(UserRole.CUSTOMER, UserRole.ADMIN), ReviewController.getBestReviews);
+router.get("/best", ReviewController.getBestReviews);
 
 // Create a review
 router.post(
@@ -21,5 +23,7 @@ router.post(
   validateRequest(createReviewZodSchema),
   ReviewController.createReview
 );
+
+router.delete("/:id", auth(UserRole.CUSTOMER, UserRole.ADMIN), ReviewController.deleteReview);
 
 export const ReviewRoutes = router;

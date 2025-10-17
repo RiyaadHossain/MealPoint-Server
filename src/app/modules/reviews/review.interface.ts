@@ -1,6 +1,7 @@
 // Review interface
 export interface IReview {
-  orderId: string;
+  menuId?: string;
+  comboId?: string;
   userId: string;
   rating: number;
   comment?: string;
