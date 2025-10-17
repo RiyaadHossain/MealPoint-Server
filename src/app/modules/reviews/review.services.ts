@@ -14,7 +14,8 @@ const getAllReviews = async (): Promise<IReview[]> => {
   return Review.find()
     .sort({ createdAt: -1 })
     .populate("userId", "name email level loyaltyPoints")
-    .populate("orderId");
+    .populate("menuId", "id name price")
+    .populate("comboId", "id name price");
 };
 
 const getReviewsByProduct = async (productId: string): Promise<IReview[]> => {
@@ -23,7 +24,8 @@ const getReviewsByProduct = async (productId: string): Promise<IReview[]> => {
     const reviews = await Review.find({ menuId: productId })
       .sort({ createdAt: -1 })
       .populate("userId", "name email level loyaltyPoints")
-      .populate("orderId");
+      .populate("menuId", "id name price")
+      .populate("comboId", "id name price");
     
     return reviews;
   }
@@ -31,7 +33,8 @@ const getReviewsByProduct = async (productId: string): Promise<IReview[]> => {
   const reviews = await Review.find({ comboId: productId })
     .sort({ createdAt: -1 })
     .populate("userId", "name email level loyaltyPoints")
-    .populate("orderId");
+    .populate("menuId", "id name price")
+    .populate("comboId", "id name price");
 
   return reviews;
 };
@@ -44,7 +47,8 @@ const getBestReviews = async (): Promise<IReview[]> => {
     .sort({ rating: -1, createdAt: -1 })
     .limit(10)
     .populate("userId", "name email level loyaltyPoints")
-    .populate({ path: "orderId" });
+    .populate("menuId", "id name price")
+    .populate("comboId", "id name price");
 };
 
 /**
